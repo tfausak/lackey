@@ -1,5 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 
 {- |
     This module is for internal use only and should be considered private. If
@@ -7,7 +9,13 @@
 -}
 module Lackey.Internal where
 
+import Data.Function ((&))
+import Servant.API ((:>))
+
+import qualified Data.Char as Char
+import qualified Data.List as List
 import qualified Data.Proxy as Proxy
+import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
 
 data Method
@@ -18,11 +26,13 @@ data Method
 
 data Endpoint = Endpoint
     { endpointMethod :: Method
+    , endpointPath :: [String]
     } deriving (Eq, Ord, Read, Show)
 
 defaultEndpoint :: Endpoint
 defaultEndpoint = Endpoint
     { endpointMethod = GET
+    , endpointPath = []
     }
 
 class HasRuby a where
@@ -51,6 +61,30 @@ instance HasRuby (Servant.Post a b) where
         { endpointMethod = POST
         }
 
+instance (GHC.KnownSymbol a, HasRuby b) => HasRuby (a :> b) where
+    type Ruby (a :> b) = Ruby b
+
+    rubyFor _proxy endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
+        { endpointPath = endpointPath endpoint ++ [GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)]
+        }
+
+methodName :: Endpoint -> String
+methodName endpoint =
+    let method = renderMethod endpoint
+        pathSegments = case endpointPath endpoint of
+            [] -> ["index"]
+            x -> x
+        path = List.intercalate "_" pathSegments
+    in  method ++ "_" ++ path
+
+renderMethod :: Endpoint -> String
+renderMethod endpoint = endpoint & endpointMethod & show & map Char.toLower
+
+renderPath :: Endpoint -> String
+renderPath endpoint = case endpointPath endpoint of
+    [] -> "/"
+    path -> concatMap ('/' :) path
+
 class HasCode a where
     codeFor :: a -> String
 
@@ -59,22 +93,22 @@ instance HasCode Endpoint where
         DELETE -> "\
             \# @param http [Net::HTTP]\n\
             \# @return [Net::HTTPResponse]\n\
-            \def delete_index(http)\n\
-            \  http.delete('/')\n\
+            \def " ++ methodName endpoint ++ "(http)\n\
+            \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
             \end\
         \"
         GET -> "\
             \# @param http [Net::HTTP]\n\
             \# @return [Net::HTTPResponse]\n\
-            \def get_index(http)\n\
-            \  http.get('/')\n\
+            \def " ++ methodName endpoint ++ "(http)\n\
+            \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
             \end\
         \"
         POST -> "\
             \# @param http [Net::HTTP]\n\
             \# @return [Net::HTTPResponse]\n\
-            \def post_index(http)\n\
-            \  http.post('/', nil)\n\
+            \def " ++ methodName endpoint ++ "(http)\n\
+            \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "', nil)\n\
             \end\
         \"
 

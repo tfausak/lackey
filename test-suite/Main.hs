@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Main where
 
@@ -41,5 +42,15 @@ spec = do
                 \# @return [Net::HTTPResponse]\n\
                 \def post_index(http)\n\
                 \  http.post('/', nil)\n\
+                \end\
+            \"
+
+        it "generates a function for getting a resource" $ do
+            let api = Proxy :: Proxy ("resource" :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \# @param http [Net::HTTP]\n\
+                \# @return [Net::HTTPResponse]\n\
+                \def get_resource(http)\n\
+                \  http.get('/resource')\n\
                 \end\
             \"

@@ -11,7 +11,8 @@ import qualified Data.Proxy as Proxy
 import qualified Servant.API as Servant
 
 data Method
-    = GET
+    = DELETE
+    | GET
     | POST
     deriving (Eq, Ord, Read, Show)
 
@@ -28,6 +29,13 @@ class HasRuby a where
     type Ruby a
 
     rubyFor :: Proxy.Proxy a -> Endpoint -> Ruby a
+
+instance HasRuby (Servant.Delete a b) where
+    type Ruby (Servant.Delete a b) = Endpoint
+
+    rubyFor _proxy endpoint = endpoint
+        { endpointMethod = DELETE
+        }
 
 instance HasRuby (Servant.Get a b) where
     type Ruby (Servant.Get a b) = Endpoint
@@ -48,6 +56,13 @@ class HasCode a where
 
 instance HasCode Endpoint where
     codeFor endpoint = case endpointMethod endpoint of
+        DELETE -> "\
+            \# @param http [Net::HTTP]\n\
+            \# @return [Net::HTTPResponse]\n\
+            \def delete_index(http)\n\
+            \  http.delete('/')\n\
+            \end\
+        \"
         GET -> "\
             \# @param http [Net::HTTP]\n\
             \# @return [Net::HTTPResponse]\n\

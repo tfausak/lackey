@@ -1,6 +1,6 @@
 # [Lackey][]
 
-Lackey is a Haskell library that generates Ruby functions for [Servant][] APIs.
+Lackey is a Haskell library for generating Ruby consumers of [Servant][] APIs.
 
 -   [Installation](#installation)
 

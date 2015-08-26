@@ -10,13 +10,18 @@ module Lackey.Internal where
 import qualified Data.Proxy as Proxy
 import qualified Servant.API as Servant
 
+data Method
+    = GET
+    | POST
+    deriving (Eq, Ord, Read, Show)
+
 data Endpoint = Endpoint
-    { endpointMethod :: String
+    { endpointMethod :: Method
     } deriving (Eq, Ord, Read, Show)
 
 defaultEndpoint :: Endpoint
 defaultEndpoint = Endpoint
-    { endpointMethod = "GET"
+    { endpointMethod = GET
     }
 
 class HasRuby a where
@@ -28,20 +33,35 @@ instance HasRuby (Servant.Get a b) where
     type Ruby (Servant.Get a b) = Endpoint
 
     rubyFor _proxy endpoint = endpoint
-        { endpointMethod = "GET"
+        { endpointMethod = GET
+        }
+
+instance HasRuby (Servant.Post a b) where
+    type Ruby (Servant.Post a b) = Endpoint
+
+    rubyFor _proxy endpoint = endpoint
+        { endpointMethod = POST
         }
 
 class HasCode a where
     codeFor :: a -> String
 
 instance HasCode Endpoint where
-    codeFor _endpoint = "\
-        \# @param http [Net::HTTP]\n\
-        \# @return [Net::HTTPResponse]\n\
-        \def get_index(http)\n\
-        \  http.get('/')\n\
-        \end\
-    \"
+    codeFor endpoint = case endpointMethod endpoint of
+        GET -> "\
+            \# @param http [Net::HTTP]\n\
+            \# @return [Net::HTTPResponse]\n\
+            \def get_index(http)\n\
+            \  http.get('/')\n\
+            \end\
+        \"
+        POST -> "\
+            \# @param http [Net::HTTP]\n\
+            \# @return [Net::HTTPResponse]\n\
+            \def post_index(http)\n\
+            \  http.post('/', nil)\n\
+            \end\
+        \"
 
 ruby :: (HasRuby a) => Proxy.Proxy a -> Ruby a
 ruby proxy = rubyFor proxy defaultEndpoint

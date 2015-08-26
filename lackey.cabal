@@ -1,0 +1,29 @@
+name: lackey
+version: 0.0.0
+cabal-version: >=1.10
+build-type: Simple
+license: MIT
+license-file: LICENSE.md
+maintainer: Taylor Fausak
+synopsis: Generate Ruby functions for Servant APIs.
+description:
+    <https://github.com/tfausak/lackey#readme>
+category: Web
+extra-source-files:
+    CHANGELOG.md
+    README.md
+
+source-repository head
+    type: git
+    location: https://github.com/tfausak/lackey
+
+library
+    exposed-modules:
+        Lackey
+    build-depends:
+        base >=4.8 && <4.9,
+        servant >=0.4 && <0.5
+    default-language: Haskell2010
+    hs-source-dirs: library
+    ghc-options: -Wall
+

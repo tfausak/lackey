@@ -19,9 +19,9 @@ import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
 
 data Method
-    = DELETE
-    | GET
-    | POST
+    = Delete
+    | Get
+    | Post
     deriving (Eq, Ord, Read, Show)
 
 data Endpoint = Endpoint
@@ -31,7 +31,7 @@ data Endpoint = Endpoint
 
 defaultEndpoint :: Endpoint
 defaultEndpoint = Endpoint
-    { endpointMethod = GET
+    { endpointMethod = Get
     , endpointPath = []
     }
 
@@ -44,21 +44,21 @@ instance HasRuby (Servant.Delete a b) where
     type Ruby (Servant.Delete a b) = Endpoint
 
     rubyFor _proxy endpoint = endpoint
-        { endpointMethod = DELETE
+        { endpointMethod = Delete
         }
 
 instance HasRuby (Servant.Get a b) where
     type Ruby (Servant.Get a b) = Endpoint
 
     rubyFor _proxy endpoint = endpoint
-        { endpointMethod = GET
+        { endpointMethod = Get
         }
 
 instance HasRuby (Servant.Post a b) where
     type Ruby (Servant.Post a b) = Endpoint
 
     rubyFor _proxy endpoint = endpoint
-        { endpointMethod = POST
+        { endpointMethod = Post
         }
 
 instance (GHC.KnownSymbol a, HasRuby b) => HasRuby (a :> b) where
@@ -90,21 +90,21 @@ class HasCode a where
 
 instance HasCode Endpoint where
     codeFor endpoint = case endpointMethod endpoint of
-        DELETE -> "\
+        Delete -> "\
             \# @param http [Net::HTTP]\n\
             \# @return [Net::HTTPResponse]\n\
             \def " ++ methodName endpoint ++ "(http)\n\
             \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
             \end\
         \"
-        GET -> "\
+        Get -> "\
             \# @param http [Net::HTTP]\n\
             \# @return [Net::HTTPResponse]\n\
             \def " ++ methodName endpoint ++ "(http)\n\
             \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
             \end\
         \"
-        POST -> "\
+        Post -> "\
             \# @param http [Net::HTTP]\n\
             \# @return [Net::HTTPResponse]\n\
             \def " ++ methodName endpoint ++ "(http)\n\

@@ -64,3 +64,19 @@ spec = do
                 \  http.get('/nested/resource')\n\
                 \end\
             \"
+
+        it "generates functions for two endpoints" $ do
+            let api = Proxy :: Proxy (Get '[] () :<|> Delete '[] ())
+            rubyForAPI api `shouldBe` "\
+                \# @param http [Net::HTTP]\n\
+                \# @return [Net::HTTPResponse]\n\
+                \def get_index(http)\n\
+                \  http.get('/')\n\
+                \end\n\
+                \\n\
+                \# @param http [Net::HTTP]\n\
+                \# @return [Net::HTTPResponse]\n\
+                \def delete_index(http)\n\
+                \  http.delete('/')\n\
+                \end\
+            \"

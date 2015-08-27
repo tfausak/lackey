@@ -10,7 +10,7 @@
 module Lackey.Internal where
 
 import Data.Function ((&))
-import Servant.API ((:>))
+import Servant.API ((:>), (:<|>)(..))
 
 import qualified Data.Char as Char
 import qualified Data.List as List
@@ -68,6 +68,13 @@ instance (GHC.KnownSymbol a, HasRuby b) => HasRuby (a :> b) where
         { endpointPath = endpointPath endpoint ++ [GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)]
         }
 
+instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
+    type Ruby (a :<|> b) = Ruby a :<|> Ruby b
+
+    rubyFor _proxy endpoint
+        = rubyFor (Proxy.Proxy :: Proxy.Proxy a) endpoint
+        :<|> rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
+
 methodName :: Endpoint -> String
 methodName endpoint =
     let method = renderMethod endpoint
@@ -111,6 +118,9 @@ instance HasCode Endpoint where
             \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "', nil)\n\
             \end\
         \"
+
+instance (HasCode a, HasCode b) => HasCode (a :<|> b) where
+    codeFor (x :<|> y) = concat [codeFor x, "\n\n", codeFor y]
 
 ruby :: (HasRuby a) => Proxy.Proxy a -> Ruby a
 ruby proxy = rubyFor proxy defaultEndpoint

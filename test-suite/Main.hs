@@ -54,3 +54,13 @@ spec = do
                 \  http.get('/resource')\n\
                 \end\
             \"
+
+        it "generates a function for getting a nested resource" $ do
+            let api = Proxy :: Proxy ("nested" :> "resource" :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \# @param http [Net::HTTP]\n\
+                \# @return [Net::HTTPResponse]\n\
+                \def get_nested_resource(http)\n\
+                \  http.get('/nested/resource')\n\
+                \end\
+            \"

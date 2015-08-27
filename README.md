@@ -3,20 +3,40 @@
 Lackey is a Haskell library for generating Ruby consumers of [Servant][] APIs.
 
 -   [Installation](#installation)
+-   [Usage](#usage)
 
 ## Installation
 
 You can install Lackey by adding it to your Cabal file.
 
-    build-depends:
-        lackey ==0.0.*
+```
+build-depends:
+    lackey ==0.0.*
+```
 
 You can also install it manually.
 
-    cabal update
-    cabal install 'lackey ==0.0.*'
+``` sh
+cabal update
+cabal install 'lackey ==0.0.*'
+```
 
 Please see [the change log][] for a detailed list of changes.
+
+## Usage
+
+Use `Lackey.rubyForAPI` to generate a string of Ruby source code for consuming
+a Servant API. For example:
+
+``` hs
+type API = "things" :> Get '[JSON] [Thing]
+
+api :: Proxy API
+api = Proxy
+
+ruby :: String
+ruby = rubyForAPI api
+```
 
 [lackey]: https://github.com/tfausak/lackey
 [servant]: http://haskell-servant.github.io

@@ -21,6 +21,7 @@ library
     exposed-modules:
         Lackey
         Lackey.Internal
+        Lackey.Internal.Method
     build-depends:
         base >=4.7 && <4.9,
         flow >=1.0 && <1.1,

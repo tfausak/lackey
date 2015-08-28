@@ -11,6 +11,7 @@
 module Lackey.Internal where
 
 import Flow
+import Lackey.Internal.Method
 import Servant.API ((:>), (:<|>)(..))
 
 import qualified Data.Char as Char
@@ -19,14 +20,6 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Proxy as Proxy
 import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
-
-data Method
-    = Delete
-    | Get
-    | Patch
-    | Post
-    | Put
-    deriving (Eq, Ord, Read, Show)
 
 data MatrixItem
     = MatrixFlag String

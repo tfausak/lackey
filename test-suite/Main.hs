@@ -15,7 +15,7 @@ main = defaultMain =<< testSpec "Lackey" spec
 spec :: Spec
 spec = do
     describe "rubyForAPI" $ do
-        it "generates a function for deleting the index" $ do
+        it "generates a function for a delete request" $ do
             let api = Proxy :: Proxy (Delete '[] ())
             rubyForAPI api `shouldBe` "\
                 \def delete_index(excon)\n\
@@ -26,7 +26,7 @@ spec = do
                 \end\
             \"
 
-        it "generates a function for getting the index" $ do
+        it "generates a function for a get request" $ do
             let api = Proxy :: Proxy (Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_index(excon)\n\
@@ -37,7 +37,7 @@ spec = do
                 \end\
             \"
 
-        it "generates a function for posting the index" $ do
+        it "generates a function for a post request" $ do
             let api = Proxy :: Proxy (Post '[] ())
             rubyForAPI api `shouldBe` "\
                 \def post_index(excon)\n\
@@ -48,24 +48,13 @@ spec = do
                 \end\
             \"
 
-        it "generates a function for getting a resource" $ do
+        it "generates a function for a resource" $ do
             let api = Proxy :: Proxy ("resource" :> Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_resource(excon)\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
                 \    :path => \"/resource\",\n\
-                \  })\n\
-                \end\
-            \"
-
-        it "generates a function for getting a nested resource" $ do
-            let api = Proxy :: Proxy ("nested" :> "resource" :> Get '[] ())
-            rubyForAPI api `shouldBe` "\
-                \def get_nested_resource(excon)\n\
-                \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/nested/resource\",\n\
                 \  })\n\
                 \end\
             \"

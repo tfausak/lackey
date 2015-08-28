@@ -43,35 +43,35 @@ class HasRuby a where
 instance HasRuby (Servant.Delete a b) where
     type Ruby (Servant.Delete a b) = Endpoint
 
-    rubyFor _proxy endpoint = endpoint
+    rubyFor _ endpoint = endpoint
         { endpointMethod = Delete
         }
 
 instance HasRuby (Servant.Get a b) where
     type Ruby (Servant.Get a b) = Endpoint
 
-    rubyFor _proxy endpoint = endpoint
+    rubyFor _ endpoint = endpoint
         { endpointMethod = Get
         }
 
 instance HasRuby (Servant.Post a b) where
     type Ruby (Servant.Post a b) = Endpoint
 
-    rubyFor _proxy endpoint = endpoint
+    rubyFor _ endpoint = endpoint
         { endpointMethod = Post
         }
 
 instance (GHC.KnownSymbol a, HasRuby b) => HasRuby (a :> b) where
     type Ruby (a :> b) = Ruby b
 
-    rubyFor _proxy endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
         { endpointPath = endpointPath endpoint ++ [GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)]
         }
 
 instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
     type Ruby (a :<|> b) = Ruby a :<|> Ruby b
 
-    rubyFor _proxy endpoint
+    rubyFor _ endpoint
         = rubyFor (Proxy.Proxy :: Proxy.Proxy a) endpoint
         :<|> rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
 

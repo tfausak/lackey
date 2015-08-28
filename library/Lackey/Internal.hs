@@ -14,6 +14,7 @@ import Flow
 import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
 import Lackey.Internal.PathSegment
+import Lackey.Internal.QueryItem
 import Servant.API ((:>), (:<|>)(..))
 
 import qualified Data.Char as Char
@@ -22,12 +23,6 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Proxy as Proxy
 import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
-
-data QueryItem
-    = QueryFlag String
-    | QueryParam String
-    | QueryParams String
-    deriving (Eq, Ord, Read, Show)
 
 data Endpoint = Endpoint
     { endpointMethod :: Method

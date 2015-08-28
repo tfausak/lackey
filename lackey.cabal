@@ -24,6 +24,7 @@ library
         Lackey.Internal.MatrixItem
         Lackey.Internal.Method
         Lackey.Internal.PathSegment
+        Lackey.Internal.QueryItem
     build-depends:
         base >=4.7 && <4.9,
         flow >=1.0 && <1.1,

@@ -87,3 +87,14 @@ spec = do
                 \  })\n\
                 \end\
             \"
+
+        it "generates a function for a capture" $ do
+            let api = Proxy :: Proxy (Capture "id" () :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_id(excon, id)\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/#{id}\",\n\
+                \  })\n\
+                \end\
+            \"

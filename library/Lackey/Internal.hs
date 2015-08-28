@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
@@ -14,6 +15,7 @@ import Servant.API ((:>), (:<|>)(..))
 
 import qualified Data.Char as Char
 import qualified Data.List as List
+import qualified Data.Maybe as Maybe
 import qualified Data.Proxy as Proxy
 import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
@@ -26,6 +28,7 @@ data Method
 
 data PathSegment
     = PathLiteral String
+    | PathCapture String
     deriving (Eq, Ord, Read, Show)
 
 data Endpoint = Endpoint
@@ -81,6 +84,15 @@ instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
         = rubyFor (Proxy.Proxy :: Proxy.Proxy a) endpoint
         :<|> rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
 
+instance (GHC.KnownSymbol a, HasRuby c) => HasRuby (Servant.Capture a b :> c) where
+    type Ruby (Servant.Capture a b :> c) = Ruby c
+
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
+        { endpointPathSegments = endpointPathSegments endpoint ++
+            [ PathCapture (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
+            ]
+        }
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
@@ -88,11 +100,15 @@ renderName endpoint =
             [] -> ["index"]
             segments -> flip map segments <| \ segment -> case segment of
                 PathLiteral literal -> literal
+                PathCapture capture -> capture
         path = List.intercalate "_" pathSegments
     in  method ++ "_" ++ path
 
 renderParams :: Endpoint -> String
-renderParams _endpoint = "excon"
+renderParams endpoint = List.intercalate ", "
+    ("excon" : (endpoint |> endpointPathSegments |> map (\ segment -> case segment of
+        PathLiteral _ -> Nothing
+        PathCapture capture -> Just capture) |> Maybe.catMaybes))
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
@@ -102,6 +118,7 @@ renderPath endpoint = case endpointPathSegments endpoint of
     [] -> "/"
     segments -> flip concatMap segments <| \ segment -> case segment of
         PathLiteral literal -> '/' : literal
+        PathCapture capture -> concat ["/#{", capture, "}"]
 
 class HasCode a where
     codeFor :: a -> String

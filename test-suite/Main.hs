@@ -175,3 +175,15 @@ spec = do
                 \  })\n\
                 \end\
             \"
+
+        it "generates a function for a request body" $ do
+            let api = Proxy :: Proxy (ReqBody '[] () :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_index(excon, body = nil)\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/\",\n\
+                \    :body => body,\n\
+                \  })\n\
+                \end\
+            \"

@@ -54,6 +54,7 @@ data Endpoint = Endpoint
     { endpointMethod :: Method
     , endpointPathSegments :: [PathSegment]
     , endpointQueryItems :: [QueryItem]
+    , endpointHasBody :: Bool
     } deriving (Eq, Ord, Read, Show)
 
 defaultEndpoint :: Endpoint
@@ -61,6 +62,7 @@ defaultEndpoint = Endpoint
     { endpointMethod = Get
     , endpointPathSegments = []
     , endpointQueryItems = []
+    , endpointHasBody = False
     }
 
 class HasRuby a where
@@ -189,6 +191,13 @@ instance (GHC.KnownSymbol a, HasRuby c) =>
             ]
         }
 
+instance (HasRuby c) => HasRuby (Servant.ReqBody a b :> c) where
+    type Ruby (Servant.ReqBody a b :> c) = Ruby c
+
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
+        { endpointHasBody = True
+        }
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
@@ -237,7 +246,11 @@ renderParams endpoint =
             |> endpointQueryItems
             |> Maybe.mapMaybe renderQueryItem
 
-    in  List.intercalate ", " (["excon"] ++ pathSegments ++ queryItems)
+        body = if endpointHasBody endpoint
+            then ["body = nil"]
+            else []
+
+    in  List.intercalate ", " (["excon"] ++ pathSegments ++ queryItems ++ body)
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
@@ -274,6 +287,7 @@ instance HasCode Endpoint where
         \  excon.request({\n\
         \    :method => :" ++ renderMethod endpoint ++ ",\n\
         \    :path => \"" ++ renderPath endpoint ++ "\",\n\
+        \" ++ (if endpointHasBody endpoint then "    :body => body,\n" else "") ++ "\
         \  })\n\
         \end\
     \"

@@ -11,6 +11,7 @@
 module Lackey.Internal where
 
 import Flow
+import Lackey.Internal.Endpoint
 import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
 import Lackey.Internal.PathSegment
@@ -23,21 +24,6 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Proxy as Proxy
 import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
-
-data Endpoint = Endpoint
-    { endpointMethod :: Method
-    , endpointPathSegments :: [PathSegment]
-    , endpointQueryItems :: [QueryItem]
-    , endpointHasBody :: Bool
-    } deriving (Eq, Ord, Read, Show)
-
-defaultEndpoint :: Endpoint
-defaultEndpoint = Endpoint
-    { endpointMethod = Get
-    , endpointPathSegments = []
-    , endpointQueryItems = []
-    , endpointHasBody = False
-    }
 
 class HasRuby a where
     type Ruby a

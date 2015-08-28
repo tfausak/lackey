@@ -84,7 +84,8 @@ instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
         = rubyFor (Proxy.Proxy :: Proxy.Proxy a) endpoint
         :<|> rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
 
-instance (GHC.KnownSymbol a, HasRuby c) => HasRuby (Servant.Capture a b :> c) where
+instance (GHC.KnownSymbol a, HasRuby c) =>
+        HasRuby (Servant.Capture a b :> c) where
     type Ruby (Servant.Capture a b :> c) = Ruby c
 
     rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
@@ -96,29 +97,35 @@ instance (GHC.KnownSymbol a, HasRuby c) => HasRuby (Servant.Capture a b :> c) wh
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
+        renderPathSegment (PathLiteral literal) = literal
+        renderPathSegment (PathCapture capture) = capture
         pathSegments = case endpointPathSegments endpoint of
             [] -> ["index"]
-            segments -> flip map segments <| \ segment -> case segment of
-                PathLiteral literal -> literal
-                PathCapture capture -> capture
+            segments -> map renderPathSegment segments
         path = List.intercalate "_" pathSegments
     in  method ++ "_" ++ path
 
 renderParams :: Endpoint -> String
-renderParams endpoint = List.intercalate ", "
-    ("excon" : (endpoint |> endpointPathSegments |> map (\ segment -> case segment of
-        PathLiteral _ -> Nothing
-        PathCapture capture -> Just capture) |> Maybe.catMaybes))
+renderParams endpoint =
+    let renderPathSegment (PathLiteral _) = Nothing
+        renderPathSegment (PathCapture capture) = Just capture
+        pathSegments
+            = endpoint
+            |> endpointPathSegments
+            |> map renderPathSegment
+            |> Maybe.catMaybes
+    in  List.intercalate ", " ("excon" : pathSegments)
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
 
 renderPath :: Endpoint -> String
-renderPath endpoint = case endpointPathSegments endpoint of
-    [] -> "/"
-    segments -> flip concatMap segments <| \ segment -> case segment of
-        PathLiteral literal -> '/' : literal
-        PathCapture capture -> concat ["/#{", capture, "}"]
+renderPath endpoint =
+    let renderPathSegment (PathLiteral literal) = '/' : literal
+        renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
+    in case endpointPathSegments endpoint of
+            [] -> "/"
+            segments -> concatMap renderPathSegment segments
 
 class HasCode a where
     codeFor :: a -> String

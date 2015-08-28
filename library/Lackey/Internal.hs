@@ -38,15 +38,21 @@ data PathSegment
     | PathMatrix Matrix
     deriving (Eq, Ord, Read, Show)
 
+data QueryItem
+    = QueryFlag String
+    deriving (Eq, Ord, Read, Show)
+
 data Endpoint = Endpoint
     { endpointMethod :: Method
     , endpointPathSegments :: [PathSegment]
+    , endpointQueryItems :: [QueryItem]
     } deriving (Eq, Ord, Read, Show)
 
 defaultEndpoint :: Endpoint
 defaultEndpoint = Endpoint
     { endpointMethod = Get
     , endpointPathSegments = []
+    , endpointQueryItems = []
     }
 
 class HasRuby a where
@@ -131,9 +137,20 @@ instance (GHC.KnownSymbol a, HasRuby c) =>
             ]
         }
 
+instance (GHC.KnownSymbol a, HasRuby b) =>
+        HasRuby (Servant.QueryFlag a :> b) where
+    type Ruby (Servant.QueryFlag a :> b) = Ruby b
+
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
+        { endpointQueryItems = endpointQueryItems endpoint ++
+            [ QueryFlag (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
+            ]
+        }
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
+
         renderPathSegment (PathLiteral literal) = literal
         renderPathSegment (PathCapture capture) = capture
         renderPathSegment (PathMatrix (MatrixFlag flag)) = flag
@@ -143,7 +160,14 @@ renderName endpoint =
             [] -> ["index"]
             segments -> map renderPathSegment segments
         path = List.intercalate "_" pathSegments
-    in  method ++ "_" ++ path
+
+        renderQueryItem (QueryFlag flag) = flag
+        queryItems = map renderQueryItem (endpointQueryItems endpoint)
+        query = if null queryItems
+            then ""
+            else "_" ++ List.intercalate "_" queryItems
+
+    in  method ++ "_" ++ path ++ query
 
 renderParams :: Endpoint -> String
 renderParams endpoint =
@@ -157,7 +181,14 @@ renderParams endpoint =
             |> endpointPathSegments
             |> map renderPathSegment
             |> Maybe.catMaybes
-    in  List.intercalate ", " ("excon" : pathSegments)
+
+        renderQueryItem (QueryFlag flag) = Just (flag ++ " = false")
+        queryItems
+            = endpoint
+            |> endpointQueryItems
+            |> Maybe.mapMaybe renderQueryItem
+
+    in  List.intercalate ", " (["excon"] ++ pathSegments ++ queryItems)
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
@@ -169,9 +200,16 @@ renderPath endpoint =
         renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{';", flag, "' if ", flag, "}"]
         renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
         renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
-    in case endpointPathSegments endpoint of
+        pathSegments = case endpointPathSegments endpoint of
             [] -> "/"
             segments -> concatMap renderPathSegment segments
+
+        renderQueryItem (QueryFlag flag) = concat ["#{'&", flag, "' if ", flag, "}"]
+        queryItems = case endpointQueryItems endpoint of
+            [] -> ""
+            items -> '?' : concatMap renderQueryItem items
+
+    in pathSegments ++ queryItems
 
 class HasCode a where
     codeFor :: a -> String

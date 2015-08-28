@@ -131,3 +131,14 @@ spec = do
                 \  })\n\
                 \end\
             \"
+
+        it "generates a function for a query flag" $ do
+            let api = Proxy :: Proxy (QueryFlag "flag" :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_index_flag(excon, flag = false)\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/?#{'&flag' if flag}\",\n\
+                \  })\n\
+                \end\
+            \"

@@ -164,3 +164,14 @@ spec = do
                 \  })\n\
                 \end\
             \"
+
+        it "generates a function for a query params" $ do
+            let api = Proxy :: Proxy (QueryParams "params" () :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_index_params(excon, params = [])\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/?#{params.map { |x| \"&params[]=#{x}\" }.join}\",\n\
+                \  })\n\
+                \end\
+            \"

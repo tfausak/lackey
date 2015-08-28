@@ -24,15 +24,19 @@ data Method
     | Post
     deriving (Eq, Ord, Read, Show)
 
+data PathSegment
+    = PathLiteral String
+    deriving (Eq, Ord, Read, Show)
+
 data Endpoint = Endpoint
     { endpointMethod :: Method
-    , endpointPath :: [String]
+    , endpointPathSegments :: [PathSegment]
     } deriving (Eq, Ord, Read, Show)
 
 defaultEndpoint :: Endpoint
 defaultEndpoint = Endpoint
     { endpointMethod = Get
-    , endpointPath = []
+    , endpointPathSegments = []
     }
 
 class HasRuby a where
@@ -65,7 +69,9 @@ instance (GHC.KnownSymbol a, HasRuby b) => HasRuby (a :> b) where
     type Ruby (a :> b) = Ruby b
 
     rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
-        { endpointPath = endpointPath endpoint ++ [GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)]
+        { endpointPathSegments = endpointPathSegments endpoint ++
+            [ PathLiteral (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
+            ]
         }
 
 instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
@@ -78,9 +84,10 @@ instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
 methodName :: Endpoint -> String
 methodName endpoint =
     let method = renderMethod endpoint
-        pathSegments = case endpointPath endpoint of
+        pathSegments = case endpointPathSegments endpoint of
             [] -> ["index"]
-            x -> x
+            segments -> flip map segments <| \ segment -> case segment of
+                PathLiteral literal -> literal
         path = List.intercalate "_" pathSegments
     in  method ++ "_" ++ path
 
@@ -88,9 +95,10 @@ renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
 
 renderPath :: Endpoint -> String
-renderPath endpoint = case endpointPath endpoint of
+renderPath endpoint = case endpointPathSegments endpoint of
     [] -> "/"
-    path -> concatMap ('/' :) path
+    segments -> flip concatMap segments <| \ segment -> case segment of
+        PathLiteral literal -> '/' : literal
 
 class HasCode a where
     codeFor :: a -> String

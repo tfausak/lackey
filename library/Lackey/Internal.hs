@@ -42,6 +42,7 @@ data PathSegment
 
 data QueryItem
     = QueryFlag String
+    | QueryParam String
     deriving (Eq, Ord, Read, Show)
 
 data Endpoint = Endpoint
@@ -163,6 +164,16 @@ instance (GHC.KnownSymbol a, HasRuby b) =>
             ]
         }
 
+instance (GHC.KnownSymbol a, HasRuby c) =>
+        HasRuby (Servant.QueryParam a b :> c) where
+    type Ruby (Servant.QueryParam a b :> c) = Ruby c
+
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
+        { endpointQueryItems = endpointQueryItems endpoint ++
+            [ QueryParam (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
+            ]
+        }
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
@@ -178,6 +189,7 @@ renderName endpoint =
         path = List.intercalate "_" pathSegments
 
         renderQueryItem (QueryFlag flag) = flag
+        renderQueryItem (QueryParam param) = param
         queryItems = map renderQueryItem (endpointQueryItems endpoint)
         query = if null queryItems
             then ""
@@ -199,6 +211,7 @@ renderParams endpoint =
             |> Maybe.catMaybes
 
         renderQueryItem (QueryFlag flag) = Just (flag ++ " = false")
+        renderQueryItem (QueryParam param) = Just (param ++ " = nil")
         queryItems
             = endpoint
             |> endpointQueryItems
@@ -221,6 +234,7 @@ renderPath endpoint =
             segments -> concatMap renderPathSegment segments
 
         renderQueryItem (QueryFlag flag) = concat ["#{'&", flag, "' if ", flag, "}"]
+        renderQueryItem (QueryParam param) = concat ["&", param, "=#{", param, "}"]
         queryItems = case endpointQueryItems endpoint of
             [] -> ""
             items -> '?' : concatMap renderQueryItem items

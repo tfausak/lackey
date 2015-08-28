@@ -26,9 +26,14 @@ data Method
     | Post
     deriving (Eq, Ord, Read, Show)
 
+data Matrix
+    = MatrixFlag String
+    deriving (Eq, Ord, Read, Show)
+
 data PathSegment
     = PathLiteral String
     | PathCapture String
+    | PathMatrix Matrix
     deriving (Eq, Ord, Read, Show)
 
 data Endpoint = Endpoint
@@ -94,11 +99,22 @@ instance (GHC.KnownSymbol a, HasRuby c) =>
             ]
         }
 
+instance (GHC.KnownSymbol a, HasRuby b) =>
+        HasRuby (Servant.MatrixFlag a :> b) where
+    type Ruby (Servant.MatrixFlag a :> b) = Ruby b
+
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
+        { endpointPathSegments = endpointPathSegments endpoint ++
+            [ PathMatrix (MatrixFlag (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)))
+            ]
+        }
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
         renderPathSegment (PathLiteral literal) = literal
         renderPathSegment (PathCapture capture) = capture
+        renderPathSegment (PathMatrix (MatrixFlag flag)) = flag
         pathSegments = case endpointPathSegments endpoint of
             [] -> ["index"]
             segments -> map renderPathSegment segments
@@ -109,6 +125,7 @@ renderParams :: Endpoint -> String
 renderParams endpoint =
     let renderPathSegment (PathLiteral _) = Nothing
         renderPathSegment (PathCapture capture) = Just capture
+        renderPathSegment (PathMatrix (MatrixFlag flag)) = Just (flag ++ " = false")
         pathSegments
             = endpoint
             |> endpointPathSegments
@@ -123,6 +140,7 @@ renderPath :: Endpoint -> String
 renderPath endpoint =
     let renderPathSegment (PathLiteral literal) = '/' : literal
         renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
+        renderPathSegment (PathMatrix (MatrixFlag flag)) = concat [";#{'", flag, "' if ", flag, "}"]
     in case endpointPathSegments endpoint of
             [] -> "/"
             segments -> concatMap renderPathSegment segments

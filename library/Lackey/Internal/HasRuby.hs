@@ -5,146 +5,120 @@
 
 module Lackey.Internal.HasRuby where
 
+import Data.Proxy (Proxy (Proxy))
+import GHC.TypeLits (KnownSymbol, symbolVal)
 import Lackey.Internal.Endpoint
 import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
 import Lackey.Internal.PathSegment
 import Lackey.Internal.QueryItem
-import Servant.API ((:>), (:<|>)(..))
+import Servant.API ((:>), (:<|>)((:<|>)))
 
-import qualified Data.Proxy as Proxy
-import qualified GHC.TypeLits as GHC
-import qualified Servant.API as Servant
+import qualified Servant.API as S
 
 class HasRuby a where
     type Ruby a
-
-    rubyFor :: Proxy.Proxy a -> Endpoint -> Ruby a
-
-instance HasRuby (Servant.Delete a b) where
-    type Ruby (Servant.Delete a b) = Endpoint
-
-    rubyFor _ endpoint = endpoint
-        { endpointMethod = Delete
-        }
-
-instance HasRuby (Servant.Get a b) where
-    type Ruby (Servant.Get a b) = Endpoint
-
-    rubyFor _ endpoint = endpoint
-        { endpointMethod = Get
-        }
-
-instance HasRuby (Servant.Patch a b) where
-    type Ruby (Servant.Patch a b) = Endpoint
-
-    rubyFor _ endpoint = endpoint
-        { endpointMethod = Patch
-        }
-
-instance HasRuby (Servant.Post a b) where
-    type Ruby (Servant.Post a b) = Endpoint
-
-    rubyFor _ endpoint = endpoint
-        { endpointMethod = Post
-        }
-
-instance HasRuby (Servant.Put a b) where
-    type Ruby (Servant.Put a b) = Endpoint
-
-    rubyFor _ endpoint = endpoint
-        { endpointMethod = Put
-        }
-
-instance (GHC.KnownSymbol a, HasRuby b) => HasRuby (a :> b) where
-    type Ruby (a :> b) = Ruby b
-
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
-        { endpointPathSegments = endpointPathSegments endpoint ++
-            [ PathLiteral (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
-            ]
-        }
+    rubyFor :: Proxy a -> Endpoint -> Ruby a
 
 instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
     type Ruby (a :<|> b) = Ruby a :<|> Ruby b
+    rubyFor _ e = rubyFor a e :<|> rubyFor b e where
+        a = Proxy :: Proxy a
+        b = Proxy :: Proxy b
 
-    rubyFor _ endpoint
-        = rubyFor (Proxy.Proxy :: Proxy.Proxy a) endpoint
-        :<|> rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
+instance (HasRuby c) => HasRuby (S.ReqBody a b :> c) where
+    type Ruby (S.ReqBody a b :> c) = Ruby c
+    rubyFor _ e = rubyFor c (e { endpointHasBody = True}) where
+        c = Proxy :: Proxy c
 
-instance (GHC.KnownSymbol a, HasRuby c) =>
-        HasRuby (Servant.Capture a b :> c) where
-    type Ruby (Servant.Capture a b :> c) = Ruby c
+-- Methods
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
-        { endpointPathSegments = endpointPathSegments endpoint ++
-            [ PathCapture (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
-            ]
-        }
+instance HasRuby (S.Delete a b) where
+    type Ruby (S.Delete a b) = Endpoint
+    rubyFor _ e = e { endpointMethod = Delete }
 
-instance (GHC.KnownSymbol a, HasRuby b) =>
-        HasRuby (Servant.MatrixFlag a :> b) where
-    type Ruby (Servant.MatrixFlag a :> b) = Ruby b
+instance HasRuby (S.Get a b) where
+    type Ruby (S.Get a b) = Endpoint
+    rubyFor _ e = e { endpointMethod = Get }
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
-        { endpointPathSegments = endpointPathSegments endpoint ++
-            [ PathMatrix (MatrixFlag (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)))
-            ]
-        }
+instance HasRuby (S.Patch a b) where
+    type Ruby (S.Patch a b) = Endpoint
+    rubyFor _ e = e { endpointMethod = Patch }
 
-instance (GHC.KnownSymbol a, HasRuby c) =>
-        HasRuby (Servant.MatrixParam a b :> c) where
-    type Ruby (Servant.MatrixParam a b :> c) = Ruby c
+instance HasRuby (S.Post a b) where
+    type Ruby (S.Post a b) = Endpoint
+    rubyFor _ e = e { endpointMethod = Post }
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
-        { endpointPathSegments = endpointPathSegments endpoint ++
-            [ PathMatrix (MatrixParam (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)))
-            ]
-        }
+instance HasRuby (S.Put a b) where
+    type Ruby (S.Put a b) = Endpoint
+    rubyFor _ e = e { endpointMethod = Put }
 
-instance (GHC.KnownSymbol a, HasRuby c) =>
-        HasRuby (Servant.MatrixParams a b :> c) where
-    type Ruby (Servant.MatrixParams a b :> c) = Ruby c
+-- Path segments
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
-        { endpointPathSegments = endpointPathSegments endpoint ++
-            [ PathMatrix (MatrixParams (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)))
-            ]
-        }
+instance (KnownSymbol symbol, HasRuby a) => HasRuby (symbol :> a) where
+    type Ruby (symbol :> a) = Ruby a
+    rubyFor _ e = rubyFor a (e { endpointPathSegments = segments }) where
+        a = Proxy :: Proxy a
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathLiteral (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
 
-instance (GHC.KnownSymbol a, HasRuby b) =>
-        HasRuby (Servant.QueryFlag a :> b) where
-    type Ruby (Servant.QueryFlag a :> b) = Ruby b
+instance (KnownSymbol symbol, HasRuby b) => HasRuby (S.Capture symbol a :> b) where
+    type Ruby (S.Capture symbol a :> b) = Ruby b
+    rubyFor _ e = rubyFor b (e { endpointPathSegments = segments }) where
+        b = Proxy :: Proxy b
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathCapture (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
-        { endpointQueryItems = endpointQueryItems endpoint ++
-            [ QueryFlag (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
-            ]
-        }
+-- Matrix items
 
-instance (GHC.KnownSymbol a, HasRuby c) =>
-        HasRuby (Servant.QueryParam a b :> c) where
-    type Ruby (Servant.QueryParam a b :> c) = Ruby c
+instance (KnownSymbol symbol, HasRuby a) => HasRuby (S.MatrixFlag symbol :> a) where
+    type Ruby (S.MatrixFlag symbol :> a) = Ruby a
+    rubyFor _ e = rubyFor a (e { endpointPathSegments = segments }) where
+        a = Proxy :: Proxy a
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathMatrix (MatrixFlag (symbolVal symbol))
+        symbol = Proxy :: Proxy symbol
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
-        { endpointQueryItems = endpointQueryItems endpoint ++
-            [ QueryParam (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
-            ]
-        }
+instance (KnownSymbol symbol, HasRuby b) => HasRuby (S.MatrixParam symbol a :> b) where
+    type Ruby (S.MatrixParam symbol a :> b) = Ruby b
+    rubyFor _ e = rubyFor b (e { endpointPathSegments = segments }) where
+        b = Proxy :: Proxy b
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathMatrix (MatrixParam (symbolVal symbol))
+        symbol = Proxy :: Proxy symbol
 
-instance (GHC.KnownSymbol a, HasRuby c) =>
-        HasRuby (Servant.QueryParams a b :> c) where
-    type Ruby (Servant.QueryParams a b :> c) = Ruby c
+instance (KnownSymbol symbol, HasRuby b) => HasRuby (S.MatrixParams symbol a :> b) where
+    type Ruby (S.MatrixParams symbol a :> b) = Ruby b
+    rubyFor _ e = rubyFor b (e { endpointPathSegments = segments }) where
+        b = Proxy :: Proxy b
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathMatrix (MatrixParams (symbolVal symbol))
+        symbol = Proxy :: Proxy symbol
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
-        { endpointQueryItems = endpointQueryItems endpoint ++
-            [ QueryParams (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a))
-            ]
-        }
+-- Query items
 
-instance (HasRuby c) => HasRuby (Servant.ReqBody a b :> c) where
-    type Ruby (Servant.ReqBody a b :> c) = Ruby c
+instance (KnownSymbol symbol, HasRuby a) => HasRuby (S.QueryFlag symbol :> a) where
+    type Ruby (S.QueryFlag symbol :> a) = Ruby a
+    rubyFor _ e = rubyFor a (e { endpointQueryItems = items }) where
+        a = Proxy :: Proxy a
+        items = endpointQueryItems e ++ [item]
+        item = QueryFlag (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
 
-    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
-        { endpointHasBody = True
-        }
+instance (KnownSymbol symbol, HasRuby b) => HasRuby (S.QueryParam symbol a :> b) where
+    type Ruby (S.QueryParam symbol a :> b) = Ruby b
+    rubyFor _ e = rubyFor b (e { endpointQueryItems = items }) where
+        b = Proxy :: Proxy b
+        items = endpointQueryItems e ++ [item]
+        item = QueryParam (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
+
+instance (KnownSymbol symbol, HasRuby b) => HasRuby (S.QueryParams symbol a :> b) where
+    type Ruby (S.QueryParams symbol a :> b) = Ruby b
+    rubyFor _ e = rubyFor b (e { endpointQueryItems = items }) where
+        b = Proxy :: Proxy b
+        items = endpointQueryItems e ++ [item]
+        item = QueryParams (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol

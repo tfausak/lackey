@@ -9,7 +9,7 @@
 -}
 module Lackey.Internal where
 
-import Data.Function ((&))
+import Flow
 import Servant.API ((:>), (:<|>)(..))
 
 import qualified Data.Char as Char
@@ -85,7 +85,7 @@ methodName endpoint =
     in  method ++ "_" ++ path
 
 renderMethod :: Endpoint -> String
-renderMethod endpoint = endpoint & endpointMethod & show & map Char.toLower
+renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
 
 renderPath :: Endpoint -> String
 renderPath endpoint = case endpointPath endpoint of

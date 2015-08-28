@@ -29,6 +29,7 @@ data Method
 data Matrix
     = MatrixFlag String
     | MatrixParam String
+    | MatrixParams String
     deriving (Eq, Ord, Read, Show)
 
 data PathSegment
@@ -120,6 +121,16 @@ instance (GHC.KnownSymbol a, HasRuby c) =>
             ]
         }
 
+instance (GHC.KnownSymbol a, HasRuby c) =>
+        HasRuby (Servant.MatrixParams a b :> c) where
+    type Ruby (Servant.MatrixParams a b :> c) = Ruby c
+
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
+        { endpointPathSegments = endpointPathSegments endpoint ++
+            [ PathMatrix (MatrixParams (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)))
+            ]
+        }
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
@@ -127,6 +138,7 @@ renderName endpoint =
         renderPathSegment (PathCapture capture) = capture
         renderPathSegment (PathMatrix (MatrixFlag flag)) = flag
         renderPathSegment (PathMatrix (MatrixParam param)) = param
+        renderPathSegment (PathMatrix (MatrixParams params)) = params
         pathSegments = case endpointPathSegments endpoint of
             [] -> ["index"]
             segments -> map renderPathSegment segments
@@ -139,6 +151,7 @@ renderParams endpoint =
         renderPathSegment (PathCapture capture) = Just capture
         renderPathSegment (PathMatrix (MatrixFlag flag)) = Just (flag ++ " = false")
         renderPathSegment (PathMatrix (MatrixParam param)) = Just (param ++ " = nil")
+        renderPathSegment (PathMatrix (MatrixParams params)) = Just (params ++ " = []")
         pathSegments
             = endpoint
             |> endpointPathSegments
@@ -155,6 +168,7 @@ renderPath endpoint =
         renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
         renderPathSegment (PathMatrix (MatrixFlag flag)) = concat [";#{'", flag, "' if ", flag, "}"]
         renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
+        renderPathSegment (PathMatrix (MatrixParams params)) = concat [";#{", params, ".map { |x| \"", params, "[]=#{x}\" }.join(';')}"]
     in case endpointPathSegments endpoint of
             [] -> "/"
             segments -> concatMap renderPathSegment segments

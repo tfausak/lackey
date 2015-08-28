@@ -107,17 +107,17 @@ instance HasCode Endpoint where
     codeFor endpoint = case endpointMethod endpoint of
         Delete -> "\
             \def " ++ methodName endpoint ++ "(http)\n\
-            \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
+            \  http." ++ renderMethod endpoint ++ "(\"" ++ renderPath endpoint ++ "\")\n\
             \end\
         \"
         Get -> "\
             \def " ++ methodName endpoint ++ "(http)\n\
-            \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
+            \  http." ++ renderMethod endpoint ++ "(\"" ++ renderPath endpoint ++ "\")\n\
             \end\
         \"
         Post -> "\
             \def " ++ methodName endpoint ++ "(http)\n\
-            \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "', nil)\n\
+            \  http." ++ renderMethod endpoint ++ "(\"" ++ renderPath endpoint ++ "\", nil)\n\
             \end\
         \"
 

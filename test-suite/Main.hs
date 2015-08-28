@@ -19,7 +19,7 @@ spec = do
             let api = Proxy :: Proxy (Delete '[] ())
             rubyForAPI api `shouldBe` "\
                 \def delete_index(http)\n\
-                \  http.delete('/')\n\
+                \  http.delete(\"/\")\n\
                 \end\
             \"
 
@@ -27,7 +27,7 @@ spec = do
             let api = Proxy :: Proxy (Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_index(http)\n\
-                \  http.get('/')\n\
+                \  http.get(\"/\")\n\
                 \end\
             \"
 
@@ -35,7 +35,7 @@ spec = do
             let api = Proxy :: Proxy (Post '[] ())
             rubyForAPI api `shouldBe` "\
                 \def post_index(http)\n\
-                \  http.post('/', nil)\n\
+                \  http.post(\"/\", nil)\n\
                 \end\
             \"
 
@@ -43,7 +43,7 @@ spec = do
             let api = Proxy :: Proxy ("resource" :> Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_resource(http)\n\
-                \  http.get('/resource')\n\
+                \  http.get(\"/resource\")\n\
                 \end\
             \"
 
@@ -51,7 +51,7 @@ spec = do
             let api = Proxy :: Proxy ("nested" :> "resource" :> Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_nested_resource(http)\n\
-                \  http.get('/nested/resource')\n\
+                \  http.get(\"/nested/resource\")\n\
                 \end\
             \"
 
@@ -59,10 +59,10 @@ spec = do
             let api = Proxy :: Proxy (Get '[] () :<|> Delete '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_index(http)\n\
-                \  http.get('/')\n\
+                \  http.get(\"/\")\n\
                 \end\n\
                 \\n\
                 \def delete_index(http)\n\
-                \  http.delete('/')\n\
+                \  http.delete(\"/\")\n\
                 \end\
             \"

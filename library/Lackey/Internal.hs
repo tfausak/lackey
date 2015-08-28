@@ -28,6 +28,7 @@ data Method
 
 data Matrix
     = MatrixFlag String
+    | MatrixParam String
     deriving (Eq, Ord, Read, Show)
 
 data PathSegment
@@ -109,12 +110,23 @@ instance (GHC.KnownSymbol a, HasRuby b) =>
             ]
         }
 
+instance (GHC.KnownSymbol a, HasRuby c) =>
+        HasRuby (Servant.MatrixParam a b :> c) where
+    type Ruby (Servant.MatrixParam a b :> c) = Ruby c
+
+    rubyFor _ endpoint = rubyFor (Proxy.Proxy :: Proxy.Proxy c) endpoint
+        { endpointPathSegments = endpointPathSegments endpoint ++
+            [ PathMatrix (MatrixParam (GHC.symbolVal (Proxy.Proxy :: Proxy.Proxy a)))
+            ]
+        }
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
         renderPathSegment (PathLiteral literal) = literal
         renderPathSegment (PathCapture capture) = capture
         renderPathSegment (PathMatrix (MatrixFlag flag)) = flag
+        renderPathSegment (PathMatrix (MatrixParam param)) = param
         pathSegments = case endpointPathSegments endpoint of
             [] -> ["index"]
             segments -> map renderPathSegment segments
@@ -126,6 +138,7 @@ renderParams endpoint =
     let renderPathSegment (PathLiteral _) = Nothing
         renderPathSegment (PathCapture capture) = Just capture
         renderPathSegment (PathMatrix (MatrixFlag flag)) = Just (flag ++ " = false")
+        renderPathSegment (PathMatrix (MatrixParam param)) = Just (param ++ " = nil")
         pathSegments
             = endpoint
             |> endpointPathSegments
@@ -141,6 +154,7 @@ renderPath endpoint =
     let renderPathSegment (PathLiteral literal) = '/' : literal
         renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
         renderPathSegment (PathMatrix (MatrixFlag flag)) = concat [";#{'", flag, "' if ", flag, "}"]
+        renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
     in case endpointPathSegments endpoint of
             [] -> "/"
             segments -> concatMap renderPathSegment segments

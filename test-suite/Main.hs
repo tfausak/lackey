@@ -109,3 +109,14 @@ spec = do
                 \  })\n\
                 \end\
             \"
+
+        it "generates a function for a matrix param" $ do
+            let api = Proxy :: Proxy (MatrixParam "param" () :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_param(excon, param = nil)\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \";param=#{param}\",\n\
+                \  })\n\
+                \end\
+            \"

@@ -81,8 +81,8 @@ instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
         = rubyFor (Proxy.Proxy :: Proxy.Proxy a) endpoint
         :<|> rubyFor (Proxy.Proxy :: Proxy.Proxy b) endpoint
 
-methodName :: Endpoint -> String
-methodName endpoint =
+renderName :: Endpoint -> String
+renderName endpoint =
     let method = renderMethod endpoint
         pathSegments = case endpointPathSegments endpoint of
             [] -> ["index"]
@@ -90,6 +90,9 @@ methodName endpoint =
                 PathLiteral literal -> literal
         path = List.intercalate "_" pathSegments
     in  method ++ "_" ++ path
+
+renderParams :: Endpoint -> String
+renderParams _endpoint = "excon"
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
@@ -105,7 +108,7 @@ class HasCode a where
 
 instance HasCode Endpoint where
     codeFor endpoint = "\
-        \def " ++ methodName endpoint ++ "(excon)\n\
+        \def " ++ renderName endpoint ++ "(" ++ renderParams endpoint ++ ")\n\
         \  excon.request({\n\
         \    :method => :" ++ renderMethod endpoint ++ ",\n\
         \    :path => \"" ++ renderPath endpoint ++ "\",\n\

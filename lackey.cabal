@@ -22,6 +22,7 @@ library
         Lackey
         Lackey.Internal
         Lackey.Internal.Endpoint
+        Lackey.Internal.HasCode
         Lackey.Internal.HasRuby
         Lackey.Internal.MatrixItem
         Lackey.Internal.Method

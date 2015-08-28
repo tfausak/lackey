@@ -113,7 +113,7 @@ spec = do
         it "generates a function for a matrix flag" $ do
             let api = Proxy :: Proxy (MatrixFlag "flag" :> Get '[] ())
             rubyForAPI api `shouldBe` "\
-                \def get_flag(excon, flag = false)\n\
+                \def get_index_flag(excon, flag = false)\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
                 \    :path => \"#{';flag' if flag}\",\n\
@@ -124,7 +124,7 @@ spec = do
         it "generates a function for a matrix param" $ do
             let api = Proxy :: Proxy (MatrixParam "param" () :> Get '[] ())
             rubyForAPI api `shouldBe` "\
-                \def get_param(excon, param = nil)\n\
+                \def get_index_param(excon, param = nil)\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
                 \    :path => \";param=#{param}\",\n\
@@ -135,7 +135,7 @@ spec = do
         it "generates a function for a matrix params" $ do
             let api = Proxy :: Proxy (MatrixParams "params" () :> Get '[] ())
             rubyForAPI api `shouldBe` "\
-                \def get_params(excon, params = [])\n\
+                \def get_index_params(excon, params = [])\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
                 \    :path => \"#{params.map { |x| \";params[]=#{x}\" }.join}\",\n\

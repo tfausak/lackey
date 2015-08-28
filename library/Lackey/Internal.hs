@@ -40,6 +40,10 @@ data PathSegment
     | PathMatrix MatrixItem
     deriving (Eq, Ord, Read, Show)
 
+isPathMatrix :: PathSegment -> Bool
+isPathMatrix (PathMatrix _) = True
+isPathMatrix _ = False
+
 data QueryItem
     = QueryFlag String
     | QueryParam String
@@ -194,9 +198,12 @@ renderName endpoint =
         renderPathSegment (PathMatrix (MatrixFlag flag)) = flag
         renderPathSegment (PathMatrix (MatrixParam param)) = param
         renderPathSegment (PathMatrix (MatrixParams params)) = params
-        pathSegments = case endpointPathSegments endpoint of
-            [] -> ["index"]
-            segments -> map renderPathSegment segments
+        pathSegments =
+            let segments = endpointPathSegments endpoint
+                renderedSegments = map renderPathSegment segments
+            in  if all isPathMatrix segments
+                then "index" : renderedSegments
+                else renderedSegments
         path = List.intercalate "_" pathSegments
 
         renderQueryItem (QueryFlag flag) = flag

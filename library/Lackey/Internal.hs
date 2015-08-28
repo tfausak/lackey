@@ -106,22 +106,16 @@ class HasCode a where
 instance HasCode Endpoint where
     codeFor endpoint = case endpointMethod endpoint of
         Delete -> "\
-            \# @param http [Net::HTTP]\n\
-            \# @return [Net::HTTPResponse]\n\
             \def " ++ methodName endpoint ++ "(http)\n\
             \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
             \end\
         \"
         Get -> "\
-            \# @param http [Net::HTTP]\n\
-            \# @return [Net::HTTPResponse]\n\
             \def " ++ methodName endpoint ++ "(http)\n\
             \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "')\n\
             \end\
         \"
         Post -> "\
-            \# @param http [Net::HTTP]\n\
-            \# @return [Net::HTTPResponse]\n\
             \def " ++ methodName endpoint ++ "(http)\n\
             \  http." ++ renderMethod endpoint ++ "('" ++ renderPath endpoint ++ "', nil)\n\
             \end\

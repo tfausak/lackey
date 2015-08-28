@@ -104,22 +104,14 @@ class HasCode a where
     codeFor :: a -> String
 
 instance HasCode Endpoint where
-    codeFor endpoint = case endpointMethod endpoint of
-        Delete -> "\
-            \def " ++ methodName endpoint ++ "(excon)\n\
-            \  excon." ++ renderMethod endpoint ++ "(\"" ++ renderPath endpoint ++ "\")\n\
-            \end\
-        \"
-        Get -> "\
-            \def " ++ methodName endpoint ++ "(excon)\n\
-            \  excon." ++ renderMethod endpoint ++ "(\"" ++ renderPath endpoint ++ "\")\n\
-            \end\
-        \"
-        Post -> "\
-            \def " ++ methodName endpoint ++ "(excon)\n\
-            \  excon." ++ renderMethod endpoint ++ "(\"" ++ renderPath endpoint ++ "\", nil)\n\
-            \end\
-        \"
+    codeFor endpoint = "\
+        \def " ++ methodName endpoint ++ "(excon)\n\
+        \  excon.request({\n\
+        \    :method => :" ++ renderMethod endpoint ++ ",\n\
+        \    :path => \"" ++ renderPath endpoint ++ "\",\n\
+        \  })\n\
+        \end\
+    \"
 
 instance (HasCode a, HasCode b) => HasCode (a :<|> b) where
     codeFor (x :<|> y) = concat [codeFor x, "\n\n", codeFor y]

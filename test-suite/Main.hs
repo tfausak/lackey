@@ -19,7 +19,10 @@ spec = do
             let api = Proxy :: Proxy (Delete '[] ())
             rubyForAPI api `shouldBe` "\
                 \def delete_index(excon)\n\
-                \  excon.delete(\"/\")\n\
+                \  excon.request({\n\
+                \    :method => :delete,\n\
+                \    :path => \"/\",\n\
+                \  })\n\
                 \end\
             \"
 
@@ -27,7 +30,10 @@ spec = do
             let api = Proxy :: Proxy (Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_index(excon)\n\
-                \  excon.get(\"/\")\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/\",\n\
+                \  })\n\
                 \end\
             \"
 
@@ -35,7 +41,10 @@ spec = do
             let api = Proxy :: Proxy (Post '[] ())
             rubyForAPI api `shouldBe` "\
                 \def post_index(excon)\n\
-                \  excon.post(\"/\", nil)\n\
+                \  excon.request({\n\
+                \    :method => :post,\n\
+                \    :path => \"/\",\n\
+                \  })\n\
                 \end\
             \"
 
@@ -43,7 +52,10 @@ spec = do
             let api = Proxy :: Proxy ("resource" :> Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_resource(excon)\n\
-                \  excon.get(\"/resource\")\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/resource\",\n\
+                \  })\n\
                 \end\
             \"
 
@@ -51,7 +63,10 @@ spec = do
             let api = Proxy :: Proxy ("nested" :> "resource" :> Get '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_nested_resource(excon)\n\
-                \  excon.get(\"/nested/resource\")\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/nested/resource\",\n\
+                \  })\n\
                 \end\
             \"
 
@@ -59,10 +74,16 @@ spec = do
             let api = Proxy :: Proxy (Get '[] () :<|> Delete '[] ())
             rubyForAPI api `shouldBe` "\
                 \def get_index(excon)\n\
-                \  excon.get(\"/\")\n\
+                \  excon.request({\n\
+                \    :method => :get,\n\
+                \    :path => \"/\",\n\
+                \  })\n\
                 \end\n\
                 \\n\
                 \def delete_index(excon)\n\
-                \  excon.delete(\"/\")\n\
+                \  excon.request({\n\
+                \    :method => :delete,\n\
+                \    :path => \"/\",\n\
+                \  })\n\
                 \end\
             \"

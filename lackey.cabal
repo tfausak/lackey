@@ -21,6 +21,7 @@ library
     exposed-modules:
         Lackey
         Lackey.Internal
+        Lackey.Internal.MatrixItem
         Lackey.Internal.Method
     build-depends:
         base >=4.7 && <4.9,

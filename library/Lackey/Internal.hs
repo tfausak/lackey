@@ -11,6 +11,7 @@
 module Lackey.Internal where
 
 import Flow
+import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
 import Servant.API ((:>), (:<|>)(..))
 
@@ -20,12 +21,6 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Proxy as Proxy
 import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
-
-data MatrixItem
-    = MatrixFlag String
-    | MatrixParam String
-    | MatrixParams String
-    deriving (Eq, Ord, Read, Show)
 
 data PathSegment
     = PathLiteral String

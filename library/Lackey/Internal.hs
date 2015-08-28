@@ -13,6 +13,7 @@ module Lackey.Internal where
 import Flow
 import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
+import Lackey.Internal.PathSegment
 import Servant.API ((:>), (:<|>)(..))
 
 import qualified Data.Char as Char
@@ -21,16 +22,6 @@ import qualified Data.Maybe as Maybe
 import qualified Data.Proxy as Proxy
 import qualified GHC.TypeLits as GHC
 import qualified Servant.API as Servant
-
-data PathSegment
-    = PathLiteral String
-    | PathCapture String
-    | PathMatrix MatrixItem
-    deriving (Eq, Ord, Read, Show)
-
-isPathMatrix :: PathSegment -> Bool
-isPathMatrix (PathMatrix _) = True
-isPathMatrix _ = False
 
 data QueryItem
     = QueryFlag String

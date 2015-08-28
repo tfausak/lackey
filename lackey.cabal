@@ -23,6 +23,7 @@ library
         Lackey.Internal
         Lackey.Internal.MatrixItem
         Lackey.Internal.Method
+        Lackey.Internal.PathSegment
     build-depends:
         base >=4.7 && <4.9,
         flow >=1.0 && <1.1,

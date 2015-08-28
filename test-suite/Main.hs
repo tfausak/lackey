@@ -105,7 +105,7 @@ spec = do
                 \def get_flag(excon, flag = false)\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
-                \    :path => \";#{'flag' if flag}\",\n\
+                \    :path => \"#{';flag' if flag}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -127,7 +127,7 @@ spec = do
                 \def get_params(excon, params = [])\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
-                \    :path => \";#{params.map { |x| \"params[]=#{x}\" }.join(';')}\",\n\
+                \    :path => \"#{params.map { |x| \";params[]=#{x}\" }.join}\",\n\
                 \  })\n\
                 \end\
             \"

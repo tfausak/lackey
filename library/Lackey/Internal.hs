@@ -166,9 +166,9 @@ renderPath :: Endpoint -> String
 renderPath endpoint =
     let renderPathSegment (PathLiteral literal) = '/' : literal
         renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = concat [";#{'", flag, "' if ", flag, "}"]
+        renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{';", flag, "' if ", flag, "}"]
         renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
-        renderPathSegment (PathMatrix (MatrixParams params)) = concat [";#{", params, ".map { |x| \"", params, "[]=#{x}\" }.join(';')}"]
+        renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
     in case endpointPathSegments endpoint of
             [] -> "/"
             segments -> concatMap renderPathSegment segments

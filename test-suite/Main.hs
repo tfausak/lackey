@@ -116,7 +116,7 @@ spec = do
                 \def get_index_flag(excon, flag = false)\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
-                \    :path => \"#{';flag' if flag}\",\n\
+                \    :path => \"/#{';flag' if flag}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -127,7 +127,7 @@ spec = do
                 \def get_index_param(excon, param = nil)\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
-                \    :path => \";param=#{param}\",\n\
+                \    :path => \"/;param=#{param}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -138,7 +138,7 @@ spec = do
                 \def get_index_params(excon, params = [])\n\
                 \  excon.request({\n\
                 \    :method => :get,\n\
-                \    :path => \"#{params.map { |x| \";params[]=#{x}\" }.join}\",\n\
+                \    :path => \"/#{params.map { |x| \";params[]=#{x}\" }.join}\",\n\
                 \  })\n\
                 \end\
             \"

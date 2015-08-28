@@ -1,6 +1,6 @@
 # [Lackey][]
 
-[![Build][]](https://img.shields.io/travis/tfausak/lackey.svg)
+[![Build][]](https://travis-ci.org/tfausak/lackey)
 
 Lackey is a Haskell library for generating Ruby consumers of [Servant][] APIs.
 
@@ -41,6 +41,6 @@ ruby = rubyForAPI api
 ```
 
 [lackey]: https://github.com/tfausak/lackey
-[build]: https://travis-ci.org/tfausak/lackey
+[build]: https://img.shields.io/travis/tfausak/lackey.svg
 [servant]: http://haskell-servant.github.io
 [the change log]: ./CHANGELOG.md

@@ -25,6 +25,7 @@ data Method
     | Get
     | Patch
     | Post
+    | Put
     deriving (Eq, Ord, Read, Show)
 
 data Matrix
@@ -87,6 +88,13 @@ instance HasRuby (Servant.Post a b) where
 
     rubyFor _ endpoint = endpoint
         { endpointMethod = Post
+        }
+
+instance HasRuby (Servant.Put a b) where
+    type Ruby (Servant.Put a b) = Endpoint
+
+    rubyFor _ endpoint = endpoint
+        { endpointMethod = Put
         }
 
 instance (GHC.KnownSymbol a, HasRuby b) => HasRuby (a :> b) where

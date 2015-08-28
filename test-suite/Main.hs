@@ -59,6 +59,17 @@ spec = do
                 \end\
             \"
 
+        it "generates a function for a put request" $ do
+            let api = Proxy :: Proxy (Put '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def put_index(excon)\n\
+                \  excon.request({\n\
+                \    :method => :put,\n\
+                \    :path => \"/\",\n\
+                \  })\n\
+                \end\
+            \"
+
         it "generates a function for a resource" $ do
             let api = Proxy :: Proxy ("resource" :> Get '[] ())
             rubyForAPI api `shouldBe` "\

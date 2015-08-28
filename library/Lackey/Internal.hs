@@ -28,7 +28,7 @@ data Method
     | Put
     deriving (Eq, Ord, Read, Show)
 
-data Matrix
+data MatrixItem
     = MatrixFlag String
     | MatrixParam String
     | MatrixParams String
@@ -37,7 +37,7 @@ data Matrix
 data PathSegment
     = PathLiteral String
     | PathCapture String
-    | PathMatrix Matrix
+    | PathMatrix MatrixItem
     deriving (Eq, Ord, Read, Show)
 
 data QueryItem

@@ -37,6 +37,17 @@ spec = do
                 \end\
             \"
 
+        it "generates a function for a patch request" $ do
+            let api = Proxy :: Proxy (Patch '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def patch_index(excon)\n\
+                \  excon.request({\n\
+                \    :method => :patch,\n\
+                \    :path => \"/\",\n\
+                \  })\n\
+                \end\
+            \"
+
         it "generates a function for a post request" $ do
             let api = Proxy :: Proxy (Post '[] ())
             rubyForAPI api `shouldBe` "\

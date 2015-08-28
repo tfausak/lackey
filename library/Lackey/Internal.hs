@@ -23,6 +23,7 @@ import qualified Servant.API as Servant
 data Method
     = Delete
     | Get
+    | Patch
     | Post
     deriving (Eq, Ord, Read, Show)
 
@@ -72,6 +73,13 @@ instance HasRuby (Servant.Get a b) where
 
     rubyFor _ endpoint = endpoint
         { endpointMethod = Get
+        }
+
+instance HasRuby (Servant.Patch a b) where
+    type Ruby (Servant.Patch a b) = Endpoint
+
+    rubyFor _ endpoint = endpoint
+        { endpointMethod = Patch
         }
 
 instance HasRuby (Servant.Post a b) where

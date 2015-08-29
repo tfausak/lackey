@@ -80,7 +80,7 @@ renderParams endpoint =
 
         body = ["body = nil" | endpointHasBody endpoint]
 
-    in  List.intercalate ", " (["excon"] ++ pathSegments ++ queryItems ++ body)
+    in  List.intercalate ", " (["excon"] ++ pathSegments ++ body ++ queryItems)
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower

@@ -61,18 +61,18 @@ renderParams :: Endpoint -> String
 renderParams endpoint =
     let renderPathSegment (PathLiteral _) = Nothing
         renderPathSegment (PathCapture capture) = Just capture
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = Just (flag ++ " = false")
-        renderPathSegment (PathMatrix (MatrixParam param)) = Just (param ++ " = nil")
-        renderPathSegment (PathMatrix (MatrixParams params)) = Just (params ++ " = []")
+        renderPathSegment (PathMatrix (MatrixFlag flag)) = Just (flag ++ ": false")
+        renderPathSegment (PathMatrix (MatrixParam param)) = Just (param ++ ": nil")
+        renderPathSegment (PathMatrix (MatrixParams params)) = Just (params ++ ": []")
         pathSegments
             = endpoint
             |> endpointPathSegments
             |> map renderPathSegment
             |> Maybe.catMaybes
 
-        renderQueryItem (QueryFlag flag) = Just (flag ++ " = false")
-        renderQueryItem (QueryParam param) = Just (param ++ " = nil")
-        renderQueryItem (QueryParams params) = Just (params ++ " = []")
+        renderQueryItem (QueryFlag flag) = Just (flag ++ ": false")
+        renderQueryItem (QueryParam param) = Just (param ++ ": nil")
+        renderQueryItem (QueryParams params) = Just (params ++ ": []")
         queryItems
             = endpoint
             |> endpointQueryItems

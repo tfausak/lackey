@@ -20,8 +20,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def delete_index(excon)\n\
                 \  excon.request({\n\
-                \    :method => :delete,\n\
-                \    :path => \"/\",\n\
+                \    method: :delete,\n\
+                \    path: \"/\",\n\
                 \  })\n\
                 \end\
             \"
@@ -31,8 +31,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index(excon)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/\",\n\
+                \    method: :get,\n\
+                \    path: \"/\",\n\
                 \  })\n\
                 \end\
             \"
@@ -42,8 +42,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def patch_index(excon)\n\
                 \  excon.request({\n\
-                \    :method => :patch,\n\
-                \    :path => \"/\",\n\
+                \    method: :patch,\n\
+                \    path: \"/\",\n\
                 \  })\n\
                 \end\
             \"
@@ -53,8 +53,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def post_index(excon)\n\
                 \  excon.request({\n\
-                \    :method => :post,\n\
-                \    :path => \"/\",\n\
+                \    method: :post,\n\
+                \    path: \"/\",\n\
                 \  })\n\
                 \end\
             \"
@@ -64,8 +64,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def put_index(excon)\n\
                 \  excon.request({\n\
-                \    :method => :put,\n\
-                \    :path => \"/\",\n\
+                \    method: :put,\n\
+                \    path: \"/\",\n\
                 \  })\n\
                 \end\
             \"
@@ -75,8 +75,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_resource(excon)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/resource\",\n\
+                \    method: :get,\n\
+                \    path: \"/resource\",\n\
                 \  })\n\
                 \end\
             \"
@@ -86,15 +86,15 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index(excon)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/\",\n\
+                \    method: :get,\n\
+                \    path: \"/\",\n\
                 \  })\n\
                 \end\n\
                 \\n\
                 \def delete_index(excon)\n\
                 \  excon.request({\n\
-                \    :method => :delete,\n\
-                \    :path => \"/\",\n\
+                \    method: :delete,\n\
+                \    path: \"/\",\n\
                 \  })\n\
                 \end\
             \"
@@ -104,8 +104,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_id(excon, id)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/#{id}\",\n\
+                \    method: :get,\n\
+                \    path: \"/#{id}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -115,8 +115,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index_flag(excon, flag: false)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/#{';flag' if flag}\",\n\
+                \    method: :get,\n\
+                \    path: \"/#{';flag' if flag}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -126,8 +126,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index_param(excon, param: nil)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/;param=#{param}\",\n\
+                \    method: :get,\n\
+                \    path: \"/;param=#{param}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -137,8 +137,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index_params(excon, params: [])\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/#{params.map { |x| \";params[]=#{x}\" }.join}\",\n\
+                \    method: :get,\n\
+                \    path: \"/#{params.map { |x| \";params[]=#{x}\" }.join}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -148,8 +148,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index_flag(excon, flag: false)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/?#{'&flag' if flag}\",\n\
+                \    method: :get,\n\
+                \    path: \"/?#{'&flag' if flag}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -159,8 +159,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index_param(excon, param: nil)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/?&param=#{param}\",\n\
+                \    method: :get,\n\
+                \    path: \"/?&param=#{param}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -170,8 +170,8 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index_params(excon, params: [])\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/?#{params.map { |x| \"&params[]=#{x}\" }.join}\",\n\
+                \    method: :get,\n\
+                \    path: \"/?#{params.map { |x| \"&params[]=#{x}\" }.join}\",\n\
                 \  })\n\
                 \end\
             \"
@@ -181,9 +181,9 @@ spec = do
             rubyForAPI api `shouldBe` "\
                 \def get_index(excon, body = nil)\n\
                 \  excon.request({\n\
-                \    :method => :get,\n\
-                \    :path => \"/\",\n\
-                \    :body => body,\n\
+                \    method: :get,\n\
+                \    path: \"/\",\n\
+                \    body: body,\n\
                 \  })\n\
                 \end\
             \"

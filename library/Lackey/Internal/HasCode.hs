@@ -20,9 +20,9 @@ instance HasCode Endpoint where
     codeFor endpoint = "\
         \def " ++ renderName endpoint ++ "(" ++ renderParams endpoint ++ ")\n\
         \  excon.request({\n\
-        \    :method => :" ++ renderMethod endpoint ++ ",\n\
-        \    :path => \"" ++ renderPath endpoint ++ "\",\n\
-        \" ++ (if endpointHasBody endpoint then "    :body => body,\n" else "") ++ "\
+        \    method: :" ++ renderMethod endpoint ++ ",\n\
+        \    path: \"" ++ renderPath endpoint ++ "\",\n\
+        \" ++ (if endpointHasBody endpoint then "    body: body,\n" else "") ++ "\
         \  })\n\
         \end\
     \"

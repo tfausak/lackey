@@ -13,6 +13,23 @@ import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 
+class HasCode a where
+    codeFor :: a -> String
+
+instance HasCode Endpoint where
+    codeFor endpoint = "\
+        \def " ++ renderName endpoint ++ "(" ++ renderParams endpoint ++ ")\n\
+        \  excon.request({\n\
+        \    :method => :" ++ renderMethod endpoint ++ ",\n\
+        \    :path => \"" ++ renderPath endpoint ++ "\",\n\
+        \" ++ (if endpointHasBody endpoint then "    :body => body,\n" else "") ++ "\
+        \  })\n\
+        \end\
+    \"
+
+instance (HasCode a, HasCode b) => HasCode (a :<|> b) where
+    codeFor (x :<|> y) = concat [codeFor x, "\n\n", codeFor y]
+
 renderName :: Endpoint -> String
 renderName endpoint =
     let method = renderMethod endpoint
@@ -61,9 +78,7 @@ renderParams endpoint =
             |> endpointQueryItems
             |> Maybe.mapMaybe renderQueryItem
 
-        body = if endpointHasBody endpoint
-            then ["body = nil"]
-            else []
+        body = ["body = nil" | endpointHasBody endpoint]
 
     in  List.intercalate ", " (["excon"] ++ pathSegments ++ queryItems ++ body)
 
@@ -92,20 +107,3 @@ renderPath endpoint =
             items -> '?' : concatMap renderQueryItem items
 
     in pathSegments ++ queryItems
-
-class HasCode a where
-    codeFor :: a -> String
-
-instance HasCode Endpoint where
-    codeFor endpoint = "\
-        \def " ++ renderName endpoint ++ "(" ++ renderParams endpoint ++ ")\n\
-        \  excon.request({\n\
-        \    :method => :" ++ renderMethod endpoint ++ ",\n\
-        \    :path => \"" ++ renderPath endpoint ++ "\",\n\
-        \" ++ (if endpointHasBody endpoint then "    :body => body,\n" else "") ++ "\
-        \  })\n\
-        \end\
-    \"
-
-instance (HasCode a, HasCode b) => HasCode (a :<|> b) where
-    codeFor (x :<|> y) = concat [codeFor x, "\n\n", codeFor y]

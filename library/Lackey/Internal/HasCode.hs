@@ -59,16 +59,22 @@ renderName endpoint =
 
 renderParams :: Endpoint -> String
 renderParams endpoint =
-    let renderPathSegment (PathLiteral _) = Nothing
-        renderPathSegment (PathCapture capture) = Just capture
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = Just (flag ++ ": false")
-        renderPathSegment (PathMatrix (MatrixParam param)) = Just (param ++ ": nil")
-        renderPathSegment (PathMatrix (MatrixParams params)) = Just (params ++ ": []")
+    let renderPathSegment (PathCapture capture) = Just capture
+        renderPathSegment _ = Nothing
         pathSegments
             = endpoint
             |> endpointPathSegments
             |> map renderPathSegment
             |> Maybe.catMaybes
+
+        renderMatrixItem (PathMatrix (MatrixFlag flag)) = Just (flag ++ ": false")
+        renderMatrixItem (PathMatrix (MatrixParam param)) = Just (param ++ ": nil")
+        renderMatrixItem (PathMatrix (MatrixParams params)) = Just (params ++ ": []")
+        renderMatrixItem _ = Nothing
+        matrixItems
+            = endpoint
+            |> endpointPathSegments
+            |> Maybe.mapMaybe renderMatrixItem
 
         renderQueryItem (QueryFlag flag) = Just (flag ++ ": false")
         renderQueryItem (QueryParam param) = Just (param ++ ": nil")
@@ -80,7 +86,8 @@ renderParams endpoint =
 
         body = ["body = nil" | endpointHasBody endpoint]
 
-    in  List.intercalate ", " (["excon"] ++ pathSegments ++ body ++ queryItems)
+    in  List.intercalate ", "
+        (concat [["excon"], pathSegments, body, matrixItems, queryItems])
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower

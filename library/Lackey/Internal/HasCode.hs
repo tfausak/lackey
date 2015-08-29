@@ -95,9 +95,10 @@ renderPath endpoint =
         pathSegments =
             let segments = endpointPathSegments endpoint
                 renderedSegments = concatMap renderPathSegment segments
-            in  if all isPathMatrix segments
-                then '/' : renderedSegments
-                else renderedSegments
+            in  case segments of
+                [] -> '/' : renderedSegments
+                (PathMatrix _ : _) -> '/' : renderedSegments
+                _ -> renderedSegments
 
         renderQueryItem (QueryFlag flag) = concat ["#{'&", flag, "' if ", flag, "}"]
         renderQueryItem (QueryParam param) = concat ["&", param, "=#{", param, "}"]

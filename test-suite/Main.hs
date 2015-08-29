@@ -143,6 +143,17 @@ spec = do
                 \end\
             \"
 
+        it "always prepends a slash" $ do
+            let api = Proxy :: Proxy (MatrixFlag "a" :> "b" :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_a_b(excon, a: false)\n\
+                \  excon.request({\n\
+                \    method: :get,\n\
+                \    path: \"/#{';a' if a}/b\",\n\
+                \  })\n\
+                \end\
+            \"
+
         it "generates a function for a query flag" $ do
             let api = Proxy :: Proxy (QueryFlag "flag" :> Get '[] ())
             rubyForAPI api `shouldBe` "\

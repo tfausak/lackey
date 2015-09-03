@@ -22,6 +22,7 @@ instance HasRuby Endpoint where
         \  excon.request({\n\
         \    method: :" ++ renderMethod endpoint ++ ",\n\
         \    path: \"" ++ renderPath endpoint ++ "\",\n\
+        \    headers: {},\n\
         \    body: " ++ (if endpointHasBody endpoint then "body" else "nil") ++ ",\n\
         \  })\n\
         \end\

@@ -22,6 +22,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :delete,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -34,6 +35,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -46,6 +48,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :patch,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -58,6 +61,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :post,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -70,6 +74,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :put,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -82,6 +87,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/resource\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -94,6 +100,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\n\
@@ -102,6 +109,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :delete,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -114,6 +122,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/#{id}\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -126,6 +135,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/#{';flag' if flag}\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -138,6 +148,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/;param=#{param}\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -150,6 +161,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/#{params.map { |x| \";params[]=#{x}\" }.join}\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -162,6 +174,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/#{';a' if a}/b\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -174,6 +187,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/?#{'&flag' if flag}\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -186,6 +200,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/?&param=#{param}\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -198,6 +213,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/?#{params.map { |x| \"&params[]=#{x}\" }.join}\",\n\
+                \    headers: {},\n\
                 \    body: nil,\n\
                 \  })\n\
                 \end\
@@ -210,6 +226,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/\",\n\
+                \    headers: {},\n\
                 \    body: body,\n\
                 \  })\n\
                 \end\
@@ -222,6 +239,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/?#{'&flag' if flag}\",\n\
+                \    headers: {},\n\
                 \    body: body,\n\
                 \  })\n\
                 \end\
@@ -234,6 +252,7 @@ spec = do
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/#{';flag' if flag}\",\n\
+                \    headers: {},\n\
                 \    body: body,\n\
                 \  })\n\
                 \end\

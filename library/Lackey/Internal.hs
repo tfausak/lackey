@@ -11,11 +11,8 @@ import Lackey.Internal.Endpoint (defaultEndpoint)
 import Lackey.Internal.HasCode (HasCode, Ruby, codeFor)
 import Lackey.Internal.HasRuby (HasRuby, rubyFor)
 
-ruby :: (HasCode a) => Proxy a -> Ruby a
-ruby proxy = codeFor proxy defaultEndpoint
-
 {- |
     Generate Ruby code from an API description.
 -}
 rubyForAPI :: (HasCode a, HasRuby (Ruby a)) => Proxy a -> String
-rubyForAPI proxy = rubyFor (ruby proxy)
+rubyForAPI proxy = rubyFor (codeFor proxy defaultEndpoint)

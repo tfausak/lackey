@@ -84,7 +84,7 @@ renderParams endpoint =
             |> endpointQueryItems
             |> Maybe.mapMaybe renderQueryItem
 
-        body = ["body = nil" | endpointHasBody endpoint]
+        body = ["body" | endpointHasBody endpoint]
 
     in  List.intercalate ", "
         (concat [["excon"], pathSegments, body, matrixItems, queryItems])

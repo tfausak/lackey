@@ -190,7 +190,7 @@ spec = do
         it "generates a function for a request body" $ do
             let api = Proxy :: Proxy (ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe` "\
-                \def get_index(excon, body = nil)\n\
+                \def get_index(excon, body)\n\
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/\",\n\
@@ -202,7 +202,7 @@ spec = do
         it "puts the body before query params" $ do
             let api = Proxy :: Proxy (QueryFlag "flag" :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe` "\
-                \def get_index_flag(excon, body = nil, flag: false)\n\
+                \def get_index_flag(excon, body, flag: false)\n\
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/?#{'&flag' if flag}\",\n\
@@ -214,7 +214,7 @@ spec = do
         it "puts the body before matrix params" $ do
             let api = Proxy :: Proxy (MatrixFlag "flag" :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe` "\
-                \def get_index_flag(excon, body = nil, flag: false)\n\
+                \def get_index_flag(excon, body, flag: false)\n\
                 \  excon.request({\n\
                 \    method: :get,\n\
                 \    path: \"/#{';flag' if flag}\",\n\

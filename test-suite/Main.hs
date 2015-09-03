@@ -283,3 +283,16 @@ spec = do
                 \  )\n\
                 \end\
             \"
+
+        it "supports response headers" $ do
+            let api = Proxy :: Proxy (Get '[] (Headers '[] ()))
+            rubyForAPI api `shouldBe` "\
+                \def get_index(excon)\n\
+                \  excon.request(\n\
+                \    method: :get,\n\
+                \    path: \"/\",\n\
+                \    headers: {},\n\
+                \    body: nil\n\
+                \  )\n\
+                \end\
+            \"

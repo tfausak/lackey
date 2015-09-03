@@ -232,6 +232,19 @@ spec = do
                 \end\
             \"
 
+        it "puts the body after path segments" $ do
+            let api = Proxy :: Proxy (Capture "segment" () :> ReqBody '[] () :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_segment(excon, segment, body)\n\
+                \  excon.request(\n\
+                \    method: :get,\n\
+                \    path: \"/#{segment}\",\n\
+                \    headers: {},\n\
+                \    body: body\n\
+                \  )\n\
+                \end\
+            \"
+
         it "puts the body before query params" $ do
             let api = Proxy :: Proxy (QueryFlag "flag" :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe` "\

@@ -19,6 +19,9 @@ x |> f = f x
 class HasRuby a where
     rubyFor :: a -> String
 
+instance HasRuby () where
+    rubyFor _ = ""
+
 instance HasRuby Endpoint where
     rubyFor endpoint = "\
         \def " ++ renderName endpoint ++ "(" ++ renderParams endpoint ++ ")\n\

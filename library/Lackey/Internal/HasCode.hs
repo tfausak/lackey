@@ -21,6 +21,10 @@ class HasCode a where
     type Ruby a
     codeFor :: Proxy a -> Endpoint -> Ruby a
 
+instance HasCode S.Raw where
+    type Ruby S.Raw = ()
+    codeFor _ _ = ()
+
 instance (HasCode a, HasCode b) => HasCode (a :<|> b) where
     type Ruby (a :<|> b) = Ruby a :<|> Ruby b
     codeFor _ e = codeFor a e :<|> codeFor b e where

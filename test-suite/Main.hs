@@ -136,3 +136,14 @@ spec = do
             let api = Proxy :: Proxy (Get '[] (Headers '[] ()))
             rubyForAPI api `shouldBe`
                 ruby "get_index" "" "get" "" "" "nil"
+
+        it "does not generate anything for raw" $ do
+            let api = Proxy :: Proxy Raw
+            rubyForAPI api `shouldBe` ""
+
+        it "supports raw as part of a larger API" $ do
+            let api = Proxy :: Proxy (Get '[] () :<|> Raw)
+            rubyForAPI api `shouldBe` concat
+                [ ruby "get_index" "" "get" "" "" "nil"
+                , "\n\n" -- TODO: This is kind of dumb.
+                ]

@@ -24,6 +24,7 @@ library
         Lackey.Internal.Endpoint
         Lackey.Internal.HasCode
         Lackey.Internal.HasRuby
+        Lackey.Internal.Header
         Lackey.Internal.MatrixItem
         Lackey.Internal.Method
         Lackey.Internal.PathSegment

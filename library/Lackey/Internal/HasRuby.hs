@@ -4,6 +4,7 @@ module Lackey.Internal.HasRuby where
 
 import Flow
 import Lackey.Internal.Endpoint
+import Lackey.Internal.Header
 import Lackey.Internal.MatrixItem
 import Lackey.Internal.PathSegment
 import Lackey.Internal.QueryItem
@@ -22,7 +23,7 @@ instance HasRuby Endpoint where
         \  excon.request(\n\
         \    method: :" ++ renderMethod endpoint ++ ",\n\
         \    path: \"" ++ renderPath endpoint ++ "\",\n\
-        \    headers: {},\n\
+        \    headers: {" ++ renderHeaders endpoint ++ "},\n\
         \    body: " ++ (if endpointHasBody endpoint then "body" else "nil") ++ "\n\
         \  )\n\
         \end\
@@ -56,7 +57,13 @@ renderName endpoint =
             then ""
             else "_" ++ List.intercalate "_" queryItems
 
-    in  method ++ "_" ++ path ++ query
+        renderHeader (Header x) = x
+        headers = map renderHeader (endpointHeaders endpoint)
+        header = if null headers
+            then ""
+            else "_" ++ List.intercalate "_" headers
+
+    in  method ++ "_" ++ path ++ query ++ header
 
 renderParams :: Endpoint -> String
 renderParams endpoint =
@@ -85,10 +92,13 @@ renderParams endpoint =
             |> endpointQueryItems
             |> Maybe.mapMaybe renderQueryItem
 
+        renderHeader (Header x) = x ++ ": nil"
+        headers = endpoint |> endpointHeaders |> map renderHeader
+
         body = ["body" | endpointHasBody endpoint]
 
     in  List.intercalate ", "
-        (concat [["excon"], pathSegments, body, matrixItems, queryItems])
+        (concat [["excon"], pathSegments, body, matrixItems, queryItems, headers])
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
@@ -116,3 +126,14 @@ renderPath endpoint =
             items -> '?' : concatMap renderQueryItem items
 
     in pathSegments ++ queryItems
+
+renderHeaders :: Endpoint -> String
+renderHeaders endpoint =
+    let headers = endpointHeaders endpoint
+    in  if null headers
+        then ""
+        else
+            let y = headers
+                    |> map (\ (Header x) -> concat ["\"", x, "\" => ", x])
+                    |> List.intercalate ", "
+            in  " " ++ y ++ " "

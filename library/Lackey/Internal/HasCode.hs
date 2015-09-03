@@ -8,6 +8,7 @@ module Lackey.Internal.HasCode where
 import Data.Proxy (Proxy (Proxy))
 import GHC.TypeLits (KnownSymbol, symbolVal)
 import Lackey.Internal.Endpoint
+import Lackey.Internal.Header
 import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
 import Lackey.Internal.PathSegment
@@ -121,4 +122,14 @@ instance (KnownSymbol symbol, HasCode b) => HasCode (S.QueryParams symbol a :> b
         b = Proxy :: Proxy b
         items = endpointQueryItems e ++ [item]
         item = QueryParams (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
+
+-- Headers
+
+instance (KnownSymbol symbol, HasCode b) => HasCode (S.Header symbol a :> b) where
+    type Ruby (S.Header symbol a :> b) = Ruby b
+    codeFor  _ e = codeFor b (e { endpointHeaders = headers }) where
+        b = Proxy :: Proxy b
+        headers = endpointHeaders e ++ [header]
+        header = Header (symbolVal symbol)
         symbol = Proxy :: Proxy symbol

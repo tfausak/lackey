@@ -270,3 +270,16 @@ spec = do
                 \  )\n\
                 \end\
             \"
+
+        it "generates a function for a header" $ do
+            let api = Proxy :: Proxy (Header "cookie" () :> Get '[] ())
+            rubyForAPI api `shouldBe` "\
+                \def get_index_cookie(excon, cookie: nil)\n\
+                \  excon.request(\n\
+                \    method: :get,\n\
+                \    path: \"/\",\n\
+                \    headers: { \"cookie\" => cookie },\n\
+                \    body: nil\n\
+                \  )\n\
+                \end\
+            \"

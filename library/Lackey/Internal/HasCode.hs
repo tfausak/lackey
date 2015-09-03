@@ -1,117 +1,124 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Lackey.Internal.HasCode where
 
-import Flow
+import Data.Proxy (Proxy (Proxy))
+import GHC.TypeLits (KnownSymbol, symbolVal)
 import Lackey.Internal.Endpoint
 import Lackey.Internal.MatrixItem
+import Lackey.Internal.Method
 import Lackey.Internal.PathSegment
 import Lackey.Internal.QueryItem
-import Servant.API ((:<|>)(..))
+import Servant.API ((:>), (:<|>)((:<|>)))
 
-import qualified Data.Char as Char
-import qualified Data.List as List
-import qualified Data.Maybe as Maybe
+import qualified Servant.API as S
 
 class HasCode a where
-    codeFor :: a -> String
-
-instance HasCode Endpoint where
-    codeFor endpoint = "\
-        \def " ++ renderName endpoint ++ "(" ++ renderParams endpoint ++ ")\n\
-        \  excon.request({\n\
-        \    method: :" ++ renderMethod endpoint ++ ",\n\
-        \    path: \"" ++ renderPath endpoint ++ "\",\n\
-        \" ++ (if endpointHasBody endpoint then "    body: body,\n" else "") ++ "\
-        \  })\n\
-        \end\
-    \"
+    type Ruby a
+    codeFor :: Proxy a -> Endpoint -> Ruby a
 
 instance (HasCode a, HasCode b) => HasCode (a :<|> b) where
-    codeFor (x :<|> y) = concat [codeFor x, "\n\n", codeFor y]
+    type Ruby (a :<|> b) = Ruby a :<|> Ruby b
+    codeFor _ e = codeFor a e :<|> codeFor b e where
+        a = Proxy :: Proxy a
+        b = Proxy :: Proxy b
 
-renderName :: Endpoint -> String
-renderName endpoint =
-    let method = renderMethod endpoint
+instance (HasCode c) => HasCode (S.ReqBody a b :> c) where
+    type Ruby (S.ReqBody a b :> c) = Ruby c
+    codeFor _ e = codeFor c (e { endpointHasBody = True}) where
+        c = Proxy :: Proxy c
 
-        renderPathSegment (PathLiteral literal) = literal
-        renderPathSegment (PathCapture capture) = capture
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = flag
-        renderPathSegment (PathMatrix (MatrixParam param)) = param
-        renderPathSegment (PathMatrix (MatrixParams params)) = params
-        pathSegments =
-            let segments = endpointPathSegments endpoint
-                renderedSegments = map renderPathSegment segments
-            in  if all isPathMatrix segments
-                then "index" : renderedSegments
-                else renderedSegments
-        path = List.intercalate "_" pathSegments
+-- Methods
 
-        renderQueryItem (QueryFlag flag) = flag
-        renderQueryItem (QueryParam param) = param
-        renderQueryItem (QueryParams params) = params
-        queryItems = map renderQueryItem (endpointQueryItems endpoint)
-        query = if null queryItems
-            then ""
-            else "_" ++ List.intercalate "_" queryItems
+instance HasCode (S.Delete a b) where
+    type Ruby (S.Delete a b) = Endpoint
+    codeFor _ e = e { endpointMethod = Delete }
 
-    in  method ++ "_" ++ path ++ query
+instance HasCode (S.Get a b) where
+    type Ruby (S.Get a b) = Endpoint
+    codeFor _ e = e { endpointMethod = Get }
 
-renderParams :: Endpoint -> String
-renderParams endpoint =
-    let renderPathSegment (PathCapture capture) = Just capture
-        renderPathSegment _ = Nothing
-        pathSegments
-            = endpoint
-            |> endpointPathSegments
-            |> map renderPathSegment
-            |> Maybe.catMaybes
+instance HasCode (S.Patch a b) where
+    type Ruby (S.Patch a b) = Endpoint
+    codeFor _ e = e { endpointMethod = Patch }
 
-        renderMatrixItem (PathMatrix (MatrixFlag flag)) = Just (flag ++ ": false")
-        renderMatrixItem (PathMatrix (MatrixParam param)) = Just (param ++ ": nil")
-        renderMatrixItem (PathMatrix (MatrixParams params)) = Just (params ++ ": []")
-        renderMatrixItem _ = Nothing
-        matrixItems
-            = endpoint
-            |> endpointPathSegments
-            |> Maybe.mapMaybe renderMatrixItem
+instance HasCode (S.Post a b) where
+    type Ruby (S.Post a b) = Endpoint
+    codeFor _ e = e { endpointMethod = Post }
 
-        renderQueryItem (QueryFlag flag) = Just (flag ++ ": false")
-        renderQueryItem (QueryParam param) = Just (param ++ ": nil")
-        renderQueryItem (QueryParams params) = Just (params ++ ": []")
-        queryItems
-            = endpoint
-            |> endpointQueryItems
-            |> Maybe.mapMaybe renderQueryItem
+instance HasCode (S.Put a b) where
+    type Ruby (S.Put a b) = Endpoint
+    codeFor _ e = e { endpointMethod = Put }
 
-        body = ["body" | endpointHasBody endpoint]
+-- Path segments
 
-    in  List.intercalate ", "
-        (concat [["excon"], pathSegments, body, matrixItems, queryItems])
+instance (KnownSymbol symbol, HasCode a) => HasCode (symbol :> a) where
+    type Ruby (symbol :> a) = Ruby a
+    codeFor _ e = codeFor a (e { endpointPathSegments = segments }) where
+        a = Proxy :: Proxy a
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathLiteral (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
 
-renderMethod :: Endpoint -> String
-renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
+instance (KnownSymbol symbol, HasCode b) => HasCode (S.Capture symbol a :> b) where
+    type Ruby (S.Capture symbol a :> b) = Ruby b
+    codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
+        b = Proxy :: Proxy b
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathCapture (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
 
-renderPath :: Endpoint -> String
-renderPath endpoint =
-    let renderPathSegment (PathLiteral literal) = '/' : literal
-        renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{';", flag, "' if ", flag, "}"]
-        renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
-        renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
-        pathSegments =
-            let segments = endpointPathSegments endpoint
-                renderedSegments = concatMap renderPathSegment segments
-            in  case segments of
-                [] -> '/' : renderedSegments
-                (PathMatrix _ : _) -> '/' : renderedSegments
-                _ -> renderedSegments
+-- Matrix items
 
-        renderQueryItem (QueryFlag flag) = concat ["#{'&", flag, "' if ", flag, "}"]
-        renderQueryItem (QueryParam param) = concat ["&", param, "=#{", param, "}"]
-        renderQueryItem (QueryParams params) = concat ["#{", params, ".map { |x| \"&", params, "[]=#{x}\" }.join}"]
-        queryItems = case endpointQueryItems endpoint of
-            [] -> ""
-            items -> '?' : concatMap renderQueryItem items
+instance (KnownSymbol symbol, HasCode a) => HasCode (S.MatrixFlag symbol :> a) where
+    type Ruby (S.MatrixFlag symbol :> a) = Ruby a
+    codeFor _ e = codeFor a (e { endpointPathSegments = segments }) where
+        a = Proxy :: Proxy a
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathMatrix (MatrixFlag (symbolVal symbol))
+        symbol = Proxy :: Proxy symbol
 
-    in pathSegments ++ queryItems
+instance (KnownSymbol symbol, HasCode b) => HasCode (S.MatrixParam symbol a :> b) where
+    type Ruby (S.MatrixParam symbol a :> b) = Ruby b
+    codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
+        b = Proxy :: Proxy b
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathMatrix (MatrixParam (symbolVal symbol))
+        symbol = Proxy :: Proxy symbol
+
+instance (KnownSymbol symbol, HasCode b) => HasCode (S.MatrixParams symbol a :> b) where
+    type Ruby (S.MatrixParams symbol a :> b) = Ruby b
+    codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
+        b = Proxy :: Proxy b
+        segments = endpointPathSegments e ++ [segment]
+        segment = PathMatrix (MatrixParams (symbolVal symbol))
+        symbol = Proxy :: Proxy symbol
+
+-- Query items
+
+instance (KnownSymbol symbol, HasCode a) => HasCode (S.QueryFlag symbol :> a) where
+    type Ruby (S.QueryFlag symbol :> a) = Ruby a
+    codeFor _ e = codeFor a (e { endpointQueryItems = items }) where
+        a = Proxy :: Proxy a
+        items = endpointQueryItems e ++ [item]
+        item = QueryFlag (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
+
+instance (KnownSymbol symbol, HasCode b) => HasCode (S.QueryParam symbol a :> b) where
+    type Ruby (S.QueryParam symbol a :> b) = Ruby b
+    codeFor _ e = codeFor b (e { endpointQueryItems = items }) where
+        b = Proxy :: Proxy b
+        items = endpointQueryItems e ++ [item]
+        item = QueryParam (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol
+
+instance (KnownSymbol symbol, HasCode b) => HasCode (S.QueryParams symbol a :> b) where
+    type Ruby (S.QueryParams symbol a :> b) = Ruby b
+    codeFor _ e = codeFor b (e { endpointQueryItems = items }) where
+        b = Proxy :: Proxy b
+        items = endpointQueryItems e ++ [item]
+        item = QueryParams (symbolVal symbol)
+        symbol = Proxy :: Proxy symbol

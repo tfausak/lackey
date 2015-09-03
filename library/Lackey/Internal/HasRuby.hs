@@ -19,12 +19,12 @@ class HasRuby a where
 instance HasRuby Endpoint where
     rubyFor endpoint = "\
         \def " ++ renderName endpoint ++ "(" ++ renderParams endpoint ++ ")\n\
-        \  excon.request({\n\
+        \  excon.request(\n\
         \    method: :" ++ renderMethod endpoint ++ ",\n\
         \    path: \"" ++ renderPath endpoint ++ "\",\n\
         \    headers: {},\n\
-        \    body: " ++ (if endpointHasBody endpoint then "body" else "nil") ++ ",\n\
-        \  })\n\
+        \    body: " ++ (if endpointHasBody endpoint then "body" else "nil") ++ "\n\
+        \  )\n\
         \end\
     \"
 

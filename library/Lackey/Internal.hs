@@ -1,18 +1,21 @@
-{-# LANGUAGE FlexibleContexts #-}
-
 {- |
     This module is for internal use only and should be considered private. If
     you need anything exported from this module, please contact the maintainer.
 -}
-module Lackey.Internal where
+module Lackey.Internal
+    ( module Lackey.Internal.Endpoint
+    , module Lackey.Internal.HasCode
+    , module Lackey.Internal.HasRuby
+    , module Lackey.Internal.MatrixItem
+    , module Lackey.Internal.Method
+    , module Lackey.Internal.PathSegment
+    , module Lackey.Internal.QueryItem
+    ) where
 
-import Data.Proxy (Proxy)
-import Lackey.Internal.Endpoint (defaultEndpoint)
-import Lackey.Internal.HasCode (HasCode, Ruby, codeFor)
-import Lackey.Internal.HasRuby (HasRuby, rubyFor)
-
-{- |
-    Generate Ruby code from an API description.
--}
-rubyForAPI :: (HasCode a, HasRuby (Ruby a)) => Proxy a -> String
-rubyForAPI proxy = rubyFor (codeFor proxy defaultEndpoint)
+import Lackey.Internal.Endpoint
+import Lackey.Internal.HasCode
+import Lackey.Internal.HasRuby
+import Lackey.Internal.MatrixItem
+import Lackey.Internal.Method
+import Lackey.Internal.PathSegment
+import Lackey.Internal.QueryItem

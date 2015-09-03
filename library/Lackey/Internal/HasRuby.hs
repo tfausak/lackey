@@ -2,7 +2,6 @@
 
 module Lackey.Internal.HasRuby where
 
-import Flow
 import Lackey.Internal.Endpoint
 import Lackey.Internal.Header
 import Lackey.Internal.MatrixItem
@@ -13,6 +12,9 @@ import Servant.API ((:<|>)(..))
 import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
+
+(|>) :: a -> (a -> b) -> b
+x |> f = f x
 
 class HasRuby a where
     rubyFor :: a -> String

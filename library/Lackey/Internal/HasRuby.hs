@@ -13,8 +13,9 @@ import qualified Data.Char as Char
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 
-(|>) :: a -> (a -> b) -> b
-x |> f = f x
+infixl 1 &
+(&) :: a -> (a -> b) -> b
+x & f = f x
 
 class HasRuby a where
     rubyFor :: a -> String
@@ -80,9 +81,9 @@ renderParams endpoint =
         renderPathSegment _ = Nothing
         pathSegments
             = endpoint
-            |> endpointPathSegments
-            |> map renderPathSegment
-            |> Maybe.catMaybes
+            & endpointPathSegments
+            & map renderPathSegment
+            & Maybe.catMaybes
 
         renderMatrixItem (PathMatrix (MatrixFlag flag)) = Just (flag ++ ": false")
         renderMatrixItem (PathMatrix (MatrixParam param)) = Just (param ++ ": nil")
@@ -90,19 +91,19 @@ renderParams endpoint =
         renderMatrixItem _ = Nothing
         matrixItems
             = endpoint
-            |> endpointPathSegments
-            |> Maybe.mapMaybe renderMatrixItem
+            & endpointPathSegments
+            & Maybe.mapMaybe renderMatrixItem
 
         renderQueryItem (QueryFlag flag) = Just (flag ++ ": false")
         renderQueryItem (QueryParam param) = Just (param ++ ": nil")
         renderQueryItem (QueryParams params) = Just (params ++ ": []")
         queryItems
             = endpoint
-            |> endpointQueryItems
-            |> Maybe.mapMaybe renderQueryItem
+            & endpointQueryItems
+            & Maybe.mapMaybe renderQueryItem
 
         renderHeader (Header x) = x ++ ": nil"
-        headers = endpoint |> endpointHeaders |> map renderHeader
+        headers = endpoint & endpointHeaders & map renderHeader
 
         body = ["body" | endpointHasBody endpoint]
 
@@ -110,7 +111,7 @@ renderParams endpoint =
         (concat [["excon"], pathSegments, body, matrixItems, queryItems, headers])
 
 renderMethod :: Endpoint -> String
-renderMethod endpoint = endpoint |> endpointMethod |> show |> map Char.toLower
+renderMethod endpoint = endpoint & endpointMethod & show & map Char.toLower
 
 renderPath :: Endpoint -> String
 renderPath endpoint =
@@ -143,6 +144,6 @@ renderHeaders endpoint =
         then ""
         else
             let y = headers
-                    |> map (\ (Header x) -> concat ["\"", x, "\" => ", x])
-                    |> List.intercalate ", "
+                    & map (\ (Header x) -> concat ["\"", x, "\" => ", x])
+                    & List.intercalate ", "
             in  " " ++ y ++ " "

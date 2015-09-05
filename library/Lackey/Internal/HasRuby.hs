@@ -35,7 +35,11 @@ instance HasRuby Endpoint where
     \"
 
 instance (HasRuby a, HasRuby b) => HasRuby (a :<|> b) where
-    rubyFor (x :<|> y) = concat [rubyFor x, "\n\n", rubyFor y]
+    rubyFor (x :<|> y) =
+        let rx = rubyFor x
+            ry = rubyFor y
+            s = if null rx || null ry then "" else "\n\n"
+        in  concat [rx, s, ry]
 
 renderName :: Endpoint -> String
 renderName endpoint =

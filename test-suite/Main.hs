@@ -75,7 +75,7 @@ spec = do
         it "supports matrix flags" $ do
             let api = Proxy :: Proxy (MatrixFlag "flag" :> Get '[] ())
             rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", flag: false" "get" "#{';flag' if flag}" "" "nil"
+                ruby "get_index_flag" ", flag: false" "get" "#{\";flag\" if flag}" "" "nil"
 
         it "supports matrix params" $ do
             let api = Proxy :: Proxy (MatrixParam "param" () :> Get '[] ())
@@ -90,7 +90,7 @@ spec = do
         it "supports query flags" $ do
             let api = Proxy :: Proxy (QueryFlag "flag" :> Get '[] ())
             rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", flag: false" "get" "?#{'&flag' if flag}" "" "nil"
+                ruby "get_index_flag" ", flag: false" "get" "?#{\"&flag\" if flag}" "" "nil"
 
         it "supports query params" $ do
             let api = Proxy :: Proxy (QueryParam "param" () :> Get '[] ())
@@ -129,7 +129,7 @@ spec = do
         it "always starts the path with a slash" $ do
             let api = Proxy :: Proxy (MatrixFlag "a" :> "b" :> Get '[] ())
             rubyForAPI api `shouldBe`
-                ruby "get_a_b" ", a: false" "get" "#{';a' if a}/b" "" "nil"
+                ruby "get_a_b" ", a: false" "get" "#{\";a\" if a}/b" "" "nil"
 
         it "puts the body param after path params" $ do
             let api = Proxy :: Proxy (Capture "segment" () :> ReqBody '[] () :> Get '[] ())
@@ -139,9 +139,9 @@ spec = do
         it "puts the body param before query params" $ do
             let api = Proxy :: Proxy (QueryFlag "flag" :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", body, flag: false" "get" "?#{'&flag' if flag}" "" "body"
+                ruby "get_index_flag" ", body, flag: false" "get" "?#{\"&flag\" if flag}" "" "body"
 
         it "puts the body param before matrix params" $ do
             let api = Proxy :: Proxy (MatrixFlag "flag" :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", body, flag: false" "get" "#{';flag' if flag}" "" "body"
+                ruby "get_index_flag" ", body, flag: false" "get" "#{\";flag\" if flag}" "" "body"

@@ -116,7 +116,7 @@ renderPath :: Endpoint -> String
 renderPath endpoint =
     let renderPathSegment (PathLiteral literal) = '/' : literal
         renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{';", flag, "' if ", flag, "}"]
+        renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{\";", flag, "\" if ", flag, "}"]
         renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
         renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
         pathSegments =
@@ -127,7 +127,7 @@ renderPath endpoint =
                 (PathMatrix _ : _) -> '/' : renderedSegments
                 _ -> renderedSegments
 
-        renderQueryItem (QueryFlag flag) = concat ["#{'&", flag, "' if ", flag, "}"]
+        renderQueryItem (QueryFlag flag) = concat ["#{\"&", flag, "\" if ", flag, "}"]
         renderQueryItem (QueryParam param) = concat ["&", param, "=#{", param, "}"]
         renderQueryItem (QueryParams params) = concat ["#{", params, ".map { |x| \"&", params, "[]=#{x}\" }.join}"]
         queryItems = case endpointQueryItems endpoint of

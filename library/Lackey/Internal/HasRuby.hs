@@ -77,7 +77,7 @@ renderName endpoint =
 
 renderParams :: Endpoint -> String
 renderParams endpoint =
-    let renderPathSegment (PathCapture capture) = Just capture
+    let renderPathSegment (PathCapture capture) = Just (sanitize capture)
         renderPathSegment _ = Nothing
         pathSegments
             = endpoint
@@ -116,7 +116,7 @@ renderMethod endpoint = endpoint & endpointMethod & show & map Char.toLower
 renderPath :: Endpoint -> String
 renderPath endpoint =
     let renderPathSegment (PathLiteral literal) = '/' : literal
-        renderPathSegment (PathCapture capture) = concat ["/#{", capture, "}"]
+        renderPathSegment (PathCapture capture) = concat ["/#{", sanitize capture, "}"]
         renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{\";", flag, "\" if ", flag, "}"]
         renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
         renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]

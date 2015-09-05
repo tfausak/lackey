@@ -150,3 +150,8 @@ spec = do
             let api = Proxy :: Proxy ("A!" :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_a_" "" "get" "A!" "" "nil"
+
+        it "sanitizes captures" $ do
+            let api = Proxy :: Proxy (Capture "A!" () :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_a_" ", a_" "get" "#{a_}" "" "nil"

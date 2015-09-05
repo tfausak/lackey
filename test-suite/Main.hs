@@ -29,37 +29,37 @@ ruby name params method path headers body = "\
 spec :: Spec
 spec = do
     describe "rubyForAPI" $ do
-        it "generates a function for a delete request" $ do
+        it "supports delete requests" $ do
             let api = Proxy :: Proxy (Delete '[] ())
             rubyForAPI api `shouldBe`
                 ruby "delete_index" "" "delete" "" "" "nil"
 
-        it "generates a function for a get request" $ do
+        it "supports get requests" $ do
             let api = Proxy :: Proxy (Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index" "" "get" "" "" "nil"
 
-        it "generates a function for a patch request" $ do
+        it "supports patch requests" $ do
             let api = Proxy :: Proxy (Patch '[] ())
             rubyForAPI api `shouldBe`
                 ruby "patch_index" "" "patch" "" "" "nil"
 
-        it "generates a function for a post request" $ do
+        it "supports post requests" $ do
             let api = Proxy :: Proxy (Post '[] ())
             rubyForAPI api `shouldBe`
                 ruby "post_index" "" "post" "" "" "nil"
 
-        it "generates a function for a put request" $ do
+        it "supports put requests" $ do
             let api = Proxy :: Proxy (Put '[] ())
             rubyForAPI api `shouldBe`
                 ruby "put_index" "" "put" "" "" "nil"
 
-        it "generates a function for a resource" $ do
+        it "supports path components" $ do
             let api = Proxy :: Proxy ("resource" :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_resource" "" "get" "resource" "" "nil"
 
-        it "generates functions for two endpoints" $ do
+        it "supports alternatives" $ do
             let api = Proxy :: Proxy (Get '[] () :<|> Delete '[] ())
             rubyForAPI api `shouldBe` concat
                 [ ruby "get_index" "" "get" "" "" "nil"
@@ -67,67 +67,47 @@ spec = do
                 , ruby "delete_index" "" "delete" "" "" "nil"
                 ]
 
-        it "generates a function for a capture" $ do
+        it "supports captures" $ do
             let api = Proxy :: Proxy (Capture "id" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_id" ", id" "get" "#{id}" "" "nil"
 
-        it "generates a function for a matrix flag" $ do
+        it "supports matrix flags" $ do
             let api = Proxy :: Proxy (MatrixFlag "flag" :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_flag" ", flag: false" "get" "#{';flag' if flag}" "" "nil"
 
-        it "generates a function for a matrix param" $ do
+        it "supports matrix params" $ do
             let api = Proxy :: Proxy (MatrixParam "param" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_param" ", param: nil" "get" ";param=#{param}" "" "nil"
 
-        it "generates a function for a matrix params" $ do
+        it "supports multiple matrix params" $ do
             let api = Proxy :: Proxy (MatrixParams "params" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_params" ", params: []" "get" "#{params.map { |x| \";params[]=#{x}\" }.join}" "" "nil"
 
-        it "always prepends a slash" $ do
-            let api = Proxy :: Proxy (MatrixFlag "a" :> "b" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_a_b" ", a: false" "get" "#{';a' if a}/b" "" "nil"
-
-        it "generates a function for a query flag" $ do
+        it "supports query flags" $ do
             let api = Proxy :: Proxy (QueryFlag "flag" :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_flag" ", flag: false" "get" "?#{'&flag' if flag}" "" "nil"
 
-        it "generates a function for a query param" $ do
+        it "supports query params" $ do
             let api = Proxy :: Proxy (QueryParam "param" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_param" ", param: nil" "get" "?&param=#{param}" "" "nil"
 
-        it "generates a function for a query params" $ do
+        it "supports multiple query params" $ do
             let api = Proxy :: Proxy (QueryParams "params" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_params" ", params: []" "get" "?#{params.map { |x| \"&params[]=#{x}\" }.join}" "" "nil"
 
-        it "generates a function for a request body" $ do
+        it "supports request bodies" $ do
             let api = Proxy :: Proxy (ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index" ", body" "get" "" "" "body"
 
-        it "puts the body after path segments" $ do
-            let api = Proxy :: Proxy (Capture "segment" () :> ReqBody '[] () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_segment" ", segment, body" "get" "#{segment}" "" "body"
-
-        it "puts the body before query params" $ do
-            let api = Proxy :: Proxy (QueryFlag "flag" :> ReqBody '[] () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", body, flag: false" "get" "?#{'&flag' if flag}" "" "body"
-
-        it "puts the body before matrix params" $ do
-            let api = Proxy :: Proxy (MatrixFlag "flag" :> ReqBody '[] () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", body, flag: false" "get" "#{';flag' if flag}" "" "body"
-
-        it "generates a function for a header" $ do
+        it "supports request headers" $ do
             let api = Proxy :: Proxy (Header "cookie" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_cookie" ", cookie: nil" "get" "" " \"cookie\" => cookie " "nil"
@@ -137,7 +117,7 @@ spec = do
             rubyForAPI api `shouldBe`
                 ruby "get_index" "" "get" "" "" "nil"
 
-        it "does not generate anything for raw" $ do
+        it "supports raw" $ do
             let api = Proxy :: Proxy Raw
             rubyForAPI api `shouldBe` ""
 
@@ -145,3 +125,23 @@ spec = do
             let api = Proxy :: Proxy (Get '[] () :<|> Raw)
             rubyForAPI api `shouldBe`
                 ruby "get_index" "" "get" "" "" "nil"
+
+        it "always starts the path with a slash" $ do
+            let api = Proxy :: Proxy (MatrixFlag "a" :> "b" :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_a_b" ", a: false" "get" "#{';a' if a}/b" "" "nil"
+
+        it "puts the body param after path params" $ do
+            let api = Proxy :: Proxy (Capture "segment" () :> ReqBody '[] () :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_segment" ", segment, body" "get" "#{segment}" "" "body"
+
+        it "puts the body param before query params" $ do
+            let api = Proxy :: Proxy (QueryFlag "flag" :> ReqBody '[] () :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_index_flag" ", body, flag: false" "get" "?#{'&flag' if flag}" "" "body"
+
+        it "puts the body param before matrix params" $ do
+            let api = Proxy :: Proxy (MatrixFlag "flag" :> ReqBody '[] () :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_index_flag" ", body, flag: false" "get" "#{';flag' if flag}" "" "body"

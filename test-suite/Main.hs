@@ -131,7 +131,7 @@ spec = do
             rubyForAPI api `shouldBe`
                 ruby "get_a_b" ", a: false" "get" "#{\";a\" if a}/b" "" "nil"
 
-        it "puts the body param after path params" $ do
+        it "puts the body param after captures" $ do
             let api = Proxy :: Proxy (Capture "segment" () :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_segment" ", segment, body" "get" "#{segment}" "" "body"
@@ -155,3 +155,8 @@ spec = do
             let api = Proxy :: Proxy (Capture "A!" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_a_" ", a_" "get" "#{a_}" "" "nil"
+
+        it "sanitizes matrix flags" $ do
+            let api = Proxy :: Proxy (MatrixFlag "A!" :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_index_a_" ", a_: false" "get" "#{\";A!\" if a_}" "" "nil"

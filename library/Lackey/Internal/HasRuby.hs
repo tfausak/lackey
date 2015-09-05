@@ -86,7 +86,7 @@ renderParams endpoint =
             & Maybe.catMaybes
 
         renderMatrixItem (PathMatrix (MatrixFlag flag)) = Just (sanitize flag ++ ": false")
-        renderMatrixItem (PathMatrix (MatrixParam param)) = Just (param ++ ": nil")
+        renderMatrixItem (PathMatrix (MatrixParam param)) = Just (sanitize param ++ ": nil")
         renderMatrixItem (PathMatrix (MatrixParams params)) = Just (params ++ ": []")
         renderMatrixItem _ = Nothing
         matrixItems
@@ -118,7 +118,7 @@ renderPath endpoint =
     let renderPathSegment (PathLiteral literal) = '/' : literal
         renderPathSegment (PathCapture capture) = concat ["/#{", sanitize capture, "}"]
         renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{\";", flag, "\" if ", sanitize flag, "}"]
-        renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", param, "}"]
+        renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", sanitize param, "}"]
         renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
         pathSegments =
             let segments = endpointPathSegments endpoint

@@ -95,7 +95,7 @@ renderParams endpoint =
             & Maybe.mapMaybe renderMatrixItem
 
         renderQueryItem (QueryFlag flag) = Just (sanitize flag ++ ": false")
-        renderQueryItem (QueryParam param) = Just (param ++ ": nil")
+        renderQueryItem (QueryParam param) = Just (sanitize param ++ ": nil")
         renderQueryItem (QueryParams params) = Just (params ++ ": []")
         queryItems
             = endpoint
@@ -129,7 +129,7 @@ renderPath endpoint =
                 _ -> renderedSegments
 
         renderQueryItem (QueryFlag flag) = concat ["#{\"&", flag, "\" if ", sanitize flag, "}"]
-        renderQueryItem (QueryParam param) = concat ["&", param, "=#{", param, "}"]
+        renderQueryItem (QueryParam param) = concat ["&", param, "=#{", sanitize param, "}"]
         renderQueryItem (QueryParams params) = concat ["#{", params, ".map { |x| \"&", params, "[]=#{x}\" }.join}"]
         queryItems = case endpointQueryItems endpoint of
             [] -> ""

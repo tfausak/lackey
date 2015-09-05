@@ -175,3 +175,8 @@ spec = do
             let api = Proxy :: Proxy (QueryFlag "A!" :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_a_" ", a_: false" "get" "?#{\"&A!\" if a_}" "" "nil"
+
+        it "sanitizes query params" $ do
+            let api = Proxy :: Proxy (QueryParam "A!" () :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_index_a_" ", a_: nil" "get" "?&A!=#{a_}" "" "nil"

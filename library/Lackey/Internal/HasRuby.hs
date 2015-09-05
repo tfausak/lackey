@@ -102,7 +102,7 @@ renderParams endpoint =
             & endpointQueryItems
             & Maybe.mapMaybe renderQueryItem
 
-        renderHeader (Header x) = x ++ ": nil"
+        renderHeader (Header header) = sanitize header ++ ": nil"
         headers = endpoint & endpointHeaders & map renderHeader
 
         body = ["body" | endpointHasBody endpoint]
@@ -144,7 +144,7 @@ renderHeaders endpoint =
         then ""
         else
             let y = headers
-                    & map (\ (Header x) -> concat ["\"", x, "\" => ", x])
+                    & map (\ (Header x) -> concat ["\"", x, "\" => ", sanitize x])
                     & List.intercalate ", "
             in  " " ++ y ++ " "
 

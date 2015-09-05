@@ -185,3 +185,8 @@ spec = do
             let api = Proxy :: Proxy (QueryParams "A!" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_a_" ", a_: []" "get" "?#{a_.map { |x| \"&A![]=#{x}\" }.join}" "" "nil"
+
+        it "sanitizes headers" $ do
+            let api = Proxy :: Proxy (Header "A!" () :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_index_a_" ", a_: nil" "get" "" " \"A!\" => a_ " "nil"

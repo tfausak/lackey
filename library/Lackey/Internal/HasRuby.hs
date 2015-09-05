@@ -96,7 +96,7 @@ renderParams endpoint =
 
         renderQueryItem (QueryFlag flag) = Just (sanitize flag ++ ": false")
         renderQueryItem (QueryParam param) = Just (sanitize param ++ ": nil")
-        renderQueryItem (QueryParams params) = Just (params ++ ": []")
+        renderQueryItem (QueryParams params) = Just (sanitize params ++ ": []")
         queryItems
             = endpoint
             & endpointQueryItems
@@ -130,7 +130,7 @@ renderPath endpoint =
 
         renderQueryItem (QueryFlag flag) = concat ["#{\"&", flag, "\" if ", sanitize flag, "}"]
         renderQueryItem (QueryParam param) = concat ["&", param, "=#{", sanitize param, "}"]
-        renderQueryItem (QueryParams params) = concat ["#{", params, ".map { |x| \"&", params, "[]=#{x}\" }.join}"]
+        renderQueryItem (QueryParams params) = concat ["#{", sanitize params, ".map { |x| \"&", params, "[]=#{x}\" }.join}"]
         queryItems = case endpointQueryItems endpoint of
             [] -> ""
             items -> '?' : concatMap renderQueryItem items

@@ -165,3 +165,8 @@ spec = do
             let api = Proxy :: Proxy (MatrixParam "A!" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_a_" ", a_: nil" "get" ";A!=#{a_}" "" "nil"
+
+        it "sanitizes multiple matrix params" $ do
+            let api = Proxy :: Proxy (MatrixParams "A!" () :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_index_a_" ", a_: []" "get" "#{a_.map { |x| \";A![]=#{x}\" }.join}" "" "nil"

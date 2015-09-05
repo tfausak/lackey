@@ -87,7 +87,7 @@ renderParams endpoint =
 
         renderMatrixItem (PathMatrix (MatrixFlag flag)) = Just (sanitize flag ++ ": false")
         renderMatrixItem (PathMatrix (MatrixParam param)) = Just (sanitize param ++ ": nil")
-        renderMatrixItem (PathMatrix (MatrixParams params)) = Just (params ++ ": []")
+        renderMatrixItem (PathMatrix (MatrixParams params)) = Just (sanitize params ++ ": []")
         renderMatrixItem _ = Nothing
         matrixItems
             = endpoint
@@ -119,7 +119,7 @@ renderPath endpoint =
         renderPathSegment (PathCapture capture) = concat ["/#{", sanitize capture, "}"]
         renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{\";", flag, "\" if ", sanitize flag, "}"]
         renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", sanitize param, "}"]
-        renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
+        renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", sanitize params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
         pathSegments =
             let segments = endpointPathSegments endpoint
                 renderedSegments = concatMap renderPathSegment segments

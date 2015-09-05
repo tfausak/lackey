@@ -60,80 +60,80 @@ instance HasCode (S.Put a b) where
 
 -- Path segments
 
-instance (KnownSymbol symbol, HasCode a) => HasCode (symbol :> a) where
-    type Ruby (symbol :> a) = Ruby a
+instance (KnownSymbol s, HasCode a) => HasCode (s :> a) where
+    type Ruby (s :> a) = Ruby a
     codeFor _ e = codeFor a (e { endpointPathSegments = segments }) where
         a = Proxy :: Proxy a
         segments = endpointPathSegments e ++ [segment]
-        segment = PathLiteral (symbolVal symbol)
-        symbol = Proxy :: Proxy symbol
+        segment = PathLiteral (symbolVal s)
+        s = Proxy :: Proxy s
 
-instance (KnownSymbol symbol, HasCode b) => HasCode (S.Capture symbol a :> b) where
-    type Ruby (S.Capture symbol a :> b) = Ruby b
+instance (KnownSymbol s, HasCode b) => HasCode (S.Capture s a :> b) where
+    type Ruby (S.Capture s a :> b) = Ruby b
     codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
         b = Proxy :: Proxy b
         segments = endpointPathSegments e ++ [segment]
-        segment = PathCapture (symbolVal symbol)
-        symbol = Proxy :: Proxy symbol
+        segment = PathCapture (symbolVal s)
+        s = Proxy :: Proxy s
 
 -- Matrix items
 
-instance (KnownSymbol symbol, HasCode a) => HasCode (S.MatrixFlag symbol :> a) where
-    type Ruby (S.MatrixFlag symbol :> a) = Ruby a
+instance (KnownSymbol s, HasCode a) => HasCode (S.MatrixFlag s :> a) where
+    type Ruby (S.MatrixFlag s :> a) = Ruby a
     codeFor _ e = codeFor a (e { endpointPathSegments = segments }) where
         a = Proxy :: Proxy a
         segments = endpointPathSegments e ++ [segment]
-        segment = PathMatrix (MatrixFlag (symbolVal symbol))
-        symbol = Proxy :: Proxy symbol
+        segment = PathMatrix (MatrixFlag (symbolVal s))
+        s = Proxy :: Proxy s
 
-instance (KnownSymbol symbol, HasCode b) => HasCode (S.MatrixParam symbol a :> b) where
-    type Ruby (S.MatrixParam symbol a :> b) = Ruby b
+instance (KnownSymbol s, HasCode b) => HasCode (S.MatrixParam s a :> b) where
+    type Ruby (S.MatrixParam s a :> b) = Ruby b
     codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
         b = Proxy :: Proxy b
         segments = endpointPathSegments e ++ [segment]
-        segment = PathMatrix (MatrixParam (symbolVal symbol))
-        symbol = Proxy :: Proxy symbol
+        segment = PathMatrix (MatrixParam (symbolVal s))
+        s = Proxy :: Proxy s
 
-instance (KnownSymbol symbol, HasCode b) => HasCode (S.MatrixParams symbol a :> b) where
-    type Ruby (S.MatrixParams symbol a :> b) = Ruby b
+instance (KnownSymbol s, HasCode b) => HasCode (S.MatrixParams s a :> b) where
+    type Ruby (S.MatrixParams s a :> b) = Ruby b
     codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
         b = Proxy :: Proxy b
         segments = endpointPathSegments e ++ [segment]
-        segment = PathMatrix (MatrixParams (symbolVal symbol))
-        symbol = Proxy :: Proxy symbol
+        segment = PathMatrix (MatrixParams (symbolVal s))
+        s = Proxy :: Proxy s
 
 -- Query items
 
-instance (KnownSymbol symbol, HasCode a) => HasCode (S.QueryFlag symbol :> a) where
-    type Ruby (S.QueryFlag symbol :> a) = Ruby a
+instance (KnownSymbol s, HasCode a) => HasCode (S.QueryFlag s :> a) where
+    type Ruby (S.QueryFlag s :> a) = Ruby a
     codeFor _ e = codeFor a (e { endpointQueryItems = items }) where
         a = Proxy :: Proxy a
         items = endpointQueryItems e ++ [item]
-        item = QueryFlag (symbolVal symbol)
-        symbol = Proxy :: Proxy symbol
+        item = QueryFlag (symbolVal s)
+        s = Proxy :: Proxy s
 
-instance (KnownSymbol symbol, HasCode b) => HasCode (S.QueryParam symbol a :> b) where
-    type Ruby (S.QueryParam symbol a :> b) = Ruby b
+instance (KnownSymbol s, HasCode b) => HasCode (S.QueryParam s a :> b) where
+    type Ruby (S.QueryParam s a :> b) = Ruby b
     codeFor _ e = codeFor b (e { endpointQueryItems = items }) where
         b = Proxy :: Proxy b
         items = endpointQueryItems e ++ [item]
-        item = QueryParam (symbolVal symbol)
-        symbol = Proxy :: Proxy symbol
+        item = QueryParam (symbolVal s)
+        s = Proxy :: Proxy s
 
-instance (KnownSymbol symbol, HasCode b) => HasCode (S.QueryParams symbol a :> b) where
-    type Ruby (S.QueryParams symbol a :> b) = Ruby b
+instance (KnownSymbol s, HasCode b) => HasCode (S.QueryParams s a :> b) where
+    type Ruby (S.QueryParams s a :> b) = Ruby b
     codeFor _ e = codeFor b (e { endpointQueryItems = items }) where
         b = Proxy :: Proxy b
         items = endpointQueryItems e ++ [item]
-        item = QueryParams (symbolVal symbol)
-        symbol = Proxy :: Proxy symbol
+        item = QueryParams (symbolVal s)
+        s = Proxy :: Proxy s
 
 -- Headers
 
-instance (KnownSymbol symbol, HasCode b) => HasCode (S.Header symbol a :> b) where
-    type Ruby (S.Header symbol a :> b) = Ruby b
+instance (KnownSymbol s, HasCode b) => HasCode (S.Header s a :> b) where
+    type Ruby (S.Header s a :> b) = Ruby b
     codeFor  _ e = codeFor b (e { endpointHeaders = headers }) where
         b = Proxy :: Proxy b
         headers = endpointHeaders e ++ [header]
-        header = Header (symbolVal symbol)
-        symbol = Proxy :: Proxy symbol
+        header = Header (symbolVal s)
+        s = Proxy :: Proxy s

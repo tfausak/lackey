@@ -145,3 +145,8 @@ spec = do
             let api = Proxy :: Proxy (MatrixFlag "flag" :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_index_flag" ", body, flag: false" "get" "#{\";flag\" if flag}" "" "body"
+
+        it "sanitizes path segments" $ do
+            let api = Proxy :: Proxy ("A!" :> Get '[] ())
+            rubyForAPI api `shouldBe`
+                ruby "get_a_" "" "get" "A!" "" "nil"

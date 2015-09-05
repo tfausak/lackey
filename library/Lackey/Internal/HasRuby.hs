@@ -73,7 +73,7 @@ renderName endpoint =
             then ""
             else "_" ++ List.intercalate "_" headers
 
-    in  method ++ "_" ++ path ++ query ++ header
+    in  sanitize (method ++ "_" ++ path ++ query ++ header)
 
 renderParams :: Endpoint -> String
 renderParams endpoint =
@@ -147,3 +147,8 @@ renderHeaders endpoint =
                     & map (\ (Header x) -> concat ["\"", x, "\" => ", x])
                     & List.intercalate ", "
             in  " " ++ y ++ " "
+
+sanitize :: String -> String
+sanitize xs
+    = xs
+    & map (\ x -> if Char.isAlphaNum x then Char.toLower x else '_')

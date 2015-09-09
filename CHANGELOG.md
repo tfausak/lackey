@@ -2,7 +2,7 @@
 
 Lackey uses [Semantic Versioning][].
 
-## v0.0.0 (2015-08-25)
+## v0.1.0 (2015-08-25)
 
 -   Initially created.
 

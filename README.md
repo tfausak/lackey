@@ -13,14 +13,14 @@ You can install Lackey by adding it to your Cabal file.
 
 ```
 build-depends:
-    lackey ==0.0.*
+    lackey ==0.1.*
 ```
 
 You can also install it manually.
 
 ``` sh
 cabal update
-cabal install 'lackey ==0.0.*'
+cabal install 'lackey ==0.1.*'
 ```
 
 Please see [the change log][] for a detailed list of changes.

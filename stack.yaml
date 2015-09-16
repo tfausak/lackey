@@ -1,2 +1,2 @@
 packages: [.]
-resolver: lts-3.4
+resolver: lts-3.5

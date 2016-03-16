@@ -1,0 +1,31 @@
+category: Web
+description: Lackey generates Ruby consumers of Servant APIs.
+extra-source-files:
+- CHANGELOG.md
+- LICENSE.md
+- package.yaml
+- README.md
+- stack.yaml
+ghc-options:
+- -Wall
+github: tfausak/lackey
+library:
+  dependencies:
+  - base >=4.7 && <4.9
+  - servant >=0.4 && <0.5
+  source-dirs: library
+license: MIT
+maintainer: Taylor Fausak
+name: lackey
+synopsis: Generate Ruby consumers of Servant APIs.
+tests:
+  lackey-test-suite:
+    dependencies:
+    - base
+    - lackey
+    - servant
+    - tasty >=0.10 && <0.12
+    - tasty-hspec >=1.1 && <1.2
+    source-dirs: test-suite
+    main: Main.hs
+version: '0.1.0'

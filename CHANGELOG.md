@@ -1,9 +1,7 @@
 # Change log
 
 Lackey uses [Semantic Versioning][].
+The change log is available through the [releases on GitHub][].
 
-## v0.1.0 (2015-08-25)
-
--   Initially created.
-
-[semantic versioning]: http://semver.org/spec/v2.0.0.html
+[Semantic Versioning]: http://semver.org/spec/v2.0.0.html
+[releases on GitHub]: https://github.com/tfausak/lackey/releases

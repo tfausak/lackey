@@ -28,4 +28,4 @@ tests:
     - tasty-hspec >=1.1 && <1.2
     source-dirs: test-suite
     main: Main.hs
-version: '0.1.0'
+version: '0.1.1'

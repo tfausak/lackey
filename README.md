@@ -44,7 +44,7 @@ ruby = rubyForAPI api
 [Lackey]: https://github.com/tfausak/lackey
 [Version badge]: https://www.stackage.org/package/lackey/badge/nightly?label=version
 [version]: https://www.stackage.org/package/lackey
-[Build badge]: https://travis-ci.org/tfausak/lackey.svg?branch=main
+[Build badge]: https://travis-ci.org/tfausak/lackey.svg?branch=master
 [build]: https://travis-ci.org/tfausak/lackey
 [Servant]: http://haskell-servant.github.io
 [the change log]: ./CHANGELOG.md

@@ -1,5 +1,6 @@
 extra-deps:
 - servant-0.5
+- servant-foreign-0.5
 install-ghc: true
 require-stack-version: ! '>=1.0.4'
-resolver: lts-5.8
+resolver: nightly-2016-03-19

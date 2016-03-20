@@ -6,7 +6,6 @@ module Lackey.Internal
     ( module Lackey.Internal.Endpoint
     , module Lackey.Internal.HasCode
     , module Lackey.Internal.HasRuby
-    , module Lackey.Internal.MatrixItem
     , module Lackey.Internal.Method
     , module Lackey.Internal.PathSegment
     , module Lackey.Internal.QueryItem
@@ -15,7 +14,6 @@ module Lackey.Internal
 import Lackey.Internal.Endpoint
 import Lackey.Internal.HasCode
 import Lackey.Internal.HasRuby
-import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
 import Lackey.Internal.PathSegment
 import Lackey.Internal.QueryItem

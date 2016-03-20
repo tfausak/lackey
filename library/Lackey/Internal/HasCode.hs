@@ -9,7 +9,6 @@ import Data.Proxy (Proxy (Proxy))
 import GHC.TypeLits (KnownSymbol, symbolVal)
 import Lackey.Internal.Endpoint
 import Lackey.Internal.Header
-import Lackey.Internal.MatrixItem
 import Lackey.Internal.Method
 import Lackey.Internal.PathSegment
 import Lackey.Internal.QueryItem
@@ -74,32 +73,6 @@ instance (KnownSymbol s, HasCode b) => HasCode (S.Capture s a :> b) where
         b = Proxy :: Proxy b
         segments = endpointPathSegments e ++ [segment]
         segment = PathCapture (symbolVal s)
-        s = Proxy :: Proxy s
-
--- Matrix items
-
-instance (KnownSymbol s, HasCode a) => HasCode (S.MatrixFlag s :> a) where
-    type Ruby (S.MatrixFlag s :> a) = Ruby a
-    codeFor _ e = codeFor a (e { endpointPathSegments = segments }) where
-        a = Proxy :: Proxy a
-        segments = endpointPathSegments e ++ [segment]
-        segment = PathMatrix (MatrixFlag (symbolVal s))
-        s = Proxy :: Proxy s
-
-instance (KnownSymbol s, HasCode b) => HasCode (S.MatrixParam s a :> b) where
-    type Ruby (S.MatrixParam s a :> b) = Ruby b
-    codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
-        b = Proxy :: Proxy b
-        segments = endpointPathSegments e ++ [segment]
-        segment = PathMatrix (MatrixParam (symbolVal s))
-        s = Proxy :: Proxy s
-
-instance (KnownSymbol s, HasCode b) => HasCode (S.MatrixParams s a :> b) where
-    type Ruby (S.MatrixParams s a :> b) = Ruby b
-    codeFor _ e = codeFor b (e { endpointPathSegments = segments }) where
-        b = Proxy :: Proxy b
-        segments = endpointPathSegments e ++ [segment]
-        segment = PathMatrix (MatrixParams (symbolVal s))
         s = Proxy :: Proxy s
 
 -- Query items

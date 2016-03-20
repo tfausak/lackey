@@ -72,21 +72,6 @@ spec = do
             rubyForAPI api `shouldBe`
                 ruby "get_id" ", id" "get" "#{id}" "" "nil"
 
-        it "supports matrix flags" $ do
-            let api = Proxy :: Proxy (MatrixFlag "flag" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", flag: false" "get" "#{\";flag\" if flag}" "" "nil"
-
-        it "supports matrix params" $ do
-            let api = Proxy :: Proxy (MatrixParam "param" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_param" ", param: nil" "get" ";param=#{param}" "" "nil"
-
-        it "supports multiple matrix params" $ do
-            let api = Proxy :: Proxy (MatrixParams "params" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_params" ", params: []" "get" "#{params.map { |x| \";params[]=#{x}\" }.join}" "" "nil"
-
         it "supports query flags" $ do
             let api = Proxy :: Proxy (QueryFlag "flag" :> Get '[] ())
             rubyForAPI api `shouldBe`
@@ -126,11 +111,6 @@ spec = do
             rubyForAPI api `shouldBe`
                 ruby "get_index" "" "get" "" "" "nil"
 
-        it "always starts the path with a slash" $ do
-            let api = Proxy :: Proxy (MatrixFlag "a" :> "b" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_a_b" ", a: false" "get" "#{\";a\" if a}/b" "" "nil"
-
         it "puts the body param after captures" $ do
             let api = Proxy :: Proxy (Capture "segment" () :> ReqBody '[] () :> Get '[] ())
             rubyForAPI api `shouldBe`
@@ -141,11 +121,6 @@ spec = do
             rubyForAPI api `shouldBe`
                 ruby "get_index_flag" ", body, flag: false" "get" "?#{\"&flag\" if flag}" "" "body"
 
-        it "puts the body param before matrix params" $ do
-            let api = Proxy :: Proxy (MatrixFlag "flag" :> ReqBody '[] () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", body, flag: false" "get" "#{\";flag\" if flag}" "" "body"
-
         it "sanitizes path segments" $ do
             let api = Proxy :: Proxy ("A!" :> Get '[] ())
             rubyForAPI api `shouldBe`
@@ -155,21 +130,6 @@ spec = do
             let api = Proxy :: Proxy (Capture "A!" () :> Get '[] ())
             rubyForAPI api `shouldBe`
                 ruby "get_a_" ", a_" "get" "#{a_}" "" "nil"
-
-        it "sanitizes matrix flags" $ do
-            let api = Proxy :: Proxy (MatrixFlag "A!" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_a_" ", a_: false" "get" "#{\";A!\" if a_}" "" "nil"
-
-        it "sanitizes matrix params" $ do
-            let api = Proxy :: Proxy (MatrixParam "A!" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_a_" ", a_: nil" "get" ";A!=#{a_}" "" "nil"
-
-        it "sanitizes multiple matrix params" $ do
-            let api = Proxy :: Proxy (MatrixParams "A!" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_a_" ", a_: []" "get" "#{a_.map { |x| \";A![]=#{x}\" }.join}" "" "nil"
 
         it "sanitizes query flags" $ do
             let api = Proxy :: Proxy (QueryFlag "A!" :> Get '[] ())

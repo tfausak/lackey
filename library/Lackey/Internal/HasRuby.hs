@@ -4,7 +4,6 @@ module Lackey.Internal.HasRuby where
 
 import Lackey.Internal.Endpoint
 import Lackey.Internal.Header
-import Lackey.Internal.MatrixItem
 import Lackey.Internal.PathSegment
 import Lackey.Internal.QueryItem
 import Servant.API ((:<|>)(..))
@@ -48,13 +47,10 @@ renderName endpoint =
 
         renderPathSegment (PathLiteral literal) = literal
         renderPathSegment (PathCapture capture) = capture
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = flag
-        renderPathSegment (PathMatrix (MatrixParam param)) = param
-        renderPathSegment (PathMatrix (MatrixParams params)) = params
         pathSegments =
             let segments = endpointPathSegments endpoint
                 renderedSegments = map renderPathSegment segments
-            in  if all isPathMatrix segments
+            in  if null segments
                 then "index" : renderedSegments
                 else renderedSegments
         path = List.intercalate "_" pathSegments
@@ -85,15 +81,6 @@ renderParams endpoint =
             & map renderPathSegment
             & Maybe.catMaybes
 
-        renderMatrixItem (PathMatrix (MatrixFlag flag)) = Just (sanitize flag ++ ": false")
-        renderMatrixItem (PathMatrix (MatrixParam param)) = Just (sanitize param ++ ": nil")
-        renderMatrixItem (PathMatrix (MatrixParams params)) = Just (sanitize params ++ ": []")
-        renderMatrixItem _ = Nothing
-        matrixItems
-            = endpoint
-            & endpointPathSegments
-            & Maybe.mapMaybe renderMatrixItem
-
         renderQueryItem (QueryFlag flag) = Just (sanitize flag ++ ": false")
         renderQueryItem (QueryParam param) = Just (sanitize param ++ ": nil")
         renderQueryItem (QueryParams params) = Just (sanitize params ++ ": []")
@@ -108,7 +95,7 @@ renderParams endpoint =
         body = ["body" | endpointHasBody endpoint]
 
     in  List.intercalate ", "
-        (concat [["excon"], pathSegments, body, matrixItems, queryItems, headers])
+        (concat [["excon"], pathSegments, body, queryItems, headers])
 
 renderMethod :: Endpoint -> String
 renderMethod endpoint = endpoint & endpointMethod & show & map Char.toLower
@@ -117,15 +104,11 @@ renderPath :: Endpoint -> String
 renderPath endpoint =
     let renderPathSegment (PathLiteral literal) = '/' : literal
         renderPathSegment (PathCapture capture) = concat ["/#{", sanitize capture, "}"]
-        renderPathSegment (PathMatrix (MatrixFlag flag)) = concat ["#{\";", flag, "\" if ", sanitize flag, "}"]
-        renderPathSegment (PathMatrix (MatrixParam param)) = concat [";", param, "=#{", sanitize param, "}"]
-        renderPathSegment (PathMatrix (MatrixParams params)) = concat ["#{", sanitize params, ".map { |x| \";", params, "[]=#{x}\" }.join}"]
         pathSegments =
             let segments = endpointPathSegments endpoint
                 renderedSegments = concatMap renderPathSegment segments
             in  case segments of
                 [] -> '/' : renderedSegments
-                (PathMatrix _ : _) -> '/' : renderedSegments
                 _ -> renderedSegments
 
         renderQueryItem (QueryFlag flag) = concat ["#{\"&", flag, "\" if ", sanitize flag, "}"]

@@ -12,7 +12,7 @@ github: tfausak/lackey
 library:
   dependencies:
   - base >=4.7 && <4.9
-  - servant >=0.4 && <0.5
+  - servant >=0.4 && <0.6
   source-dirs: library
 license: MIT
 maintainer: Taylor Fausak

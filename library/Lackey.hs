@@ -4,6 +4,7 @@
 module Lackey (rubyForAPI) where
 
 import Data.Function ((&))
+import qualified Data.Maybe as Maybe
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
@@ -25,8 +26,26 @@ renderRequests requests = requests & map renderRequest & Text.intercalate ";"
 functionName :: Servant.Req Request -> Text.Text
 functionName request = request & Servant._reqFuncName & Servant.snakeCase
 
+hasBody :: Servant.Req Request -> Bool
+hasBody request =
+    case Servant._reqBody request of
+        Nothing -> False
+        Just _ -> True
+
+bodyArgument :: Text.Text
+bodyArgument = "body"
+
 functionArguments :: Servant.Req Request -> Text.Text
-functionArguments _ = "(excon)"
+functionArguments request =
+    Text.concat
+        [ "("
+        , [ Just "excon"
+          , if hasBody request
+                then Just bodyArgument
+                else Nothing] &
+          Maybe.catMaybes &
+          Text.intercalate ","
+        , ")"]
 
 requestMethod :: Servant.Req Request -> Text.Text
 requestMethod request =
@@ -40,7 +59,10 @@ requestHeaders :: Servant.Req Request -> Text.Text
 requestHeaders _request = "{}"
 
 requestBody :: Servant.Req Request -> Text.Text
-requestBody _request = "nil"
+requestBody request =
+    if hasBody request
+        then bodyArgument
+        else "nil"
 
 functionBody :: Servant.Req Request -> Text.Text
 functionBody request =

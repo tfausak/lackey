@@ -29,7 +29,9 @@ functionArguments :: Servant.Req Request -> Text.Text
 functionArguments _ = "(excon)"
 
 requestMethod :: Servant.Req Request -> Text.Text
-requestMethod request = request & Servant._reqMethod & Text.decodeUtf8 & Text.toLower & Text.cons ':'
+requestMethod request =
+    request & Servant._reqMethod & Text.decodeUtf8 & Text.toLower &
+    Text.cons ':'
 
 requestPath :: Servant.Req Request -> Text.Text
 requestPath _request = "''"
@@ -41,26 +43,37 @@ requestBody :: Servant.Req Request -> Text.Text
 requestBody _request = "nil"
 
 functionBody :: Servant.Req Request -> Text.Text
-functionBody request = Text.concat
-    [ "excon.request("
-    , ":method=>", requestMethod request, ","
-    , ":path=>", requestPath request, ","
-    , ":headers=>", requestHeaders request, ","
-    , ":body=>", requestBody request
-    , ")"
-    ]
+functionBody request =
+    Text.concat
+        [ "excon.request("
+        , ":method=>"
+        , requestMethod request
+        , ","
+        , ":path=>"
+        , requestPath request
+        , ","
+        , ":headers=>"
+        , requestHeaders request
+        , ","
+        , ":body=>"
+        , requestBody request
+        , ")"]
 
 renderRequest :: Servant.Req Request -> Text.Text
-renderRequest request = Text.concat
-    [ "def "
-    , functionName request
-    , functionArguments request
-    , functionBody request
-    , "end"
-    ]
+renderRequest request =
+    Text.concat
+        [ "def "
+        , functionName request
+        , functionArguments request
+        , functionBody request
+        , "end"]
 
-requestsForAPI :: (Servant.HasForeign Language Request api, Servant.GenerateList Request (Servant.Foreign Request api)) => Proxy.Proxy api -> [Servant.Req Request]
+requestsForAPI
+    :: (Servant.HasForeign Language Request api, Servant.GenerateList Request (Servant.Foreign Request api))
+    => Proxy.Proxy api -> [Servant.Req Request]
 requestsForAPI api = api & Servant.listFromAPI languageProxy requestProxy
 
-rubyForAPI :: (Servant.HasForeign Language Request api, Servant.GenerateList Request (Servant.Foreign Request api)) => Proxy.Proxy api -> Text.Text
+rubyForAPI
+    :: (Servant.HasForeign Language Request api, Servant.GenerateList Request (Servant.Foreign Request api))
+    => Proxy.Proxy api -> Text.Text
 rubyForAPI api = api & requestsForAPI & renderRequests

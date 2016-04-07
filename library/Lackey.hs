@@ -28,10 +28,13 @@ functionName request = request & Servant._reqFuncName & Servant.snakeCase
 functionArguments :: Servant.Req Request -> Text.Text
 functionArguments _ = "(excon)"
 
+requestMethod :: Servant.Req Request -> Text.Text
+requestMethod request = request & Servant._reqMethod & Text.decodeUtf8 & Text.toLower
+
 functionBody :: Servant.Req Request -> Text.Text
 functionBody request = Text.concat
     [ "excon.request("
-    , ":method=>:", Text.toLower (Text.decodeUtf8 (Servant._reqMethod request)), ","
+    , ":method=>:", requestMethod request, ","
     , ":path=>'',"
     , ":headers=>{},"
     , ":body=>nil"

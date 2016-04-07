@@ -4,42 +4,42 @@
 module Lackey (rubyForAPI) where
 
 import Data.Function ((&))
-import qualified Data.Proxy as P
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as E
-import qualified Servant.Foreign as S
+import qualified Data.Proxy as Proxy
+import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import qualified Servant.Foreign as Servant
 
-type Language = S.NoTypes
+type Language = Servant.NoTypes
 
-languageProxy :: P.Proxy Language
-languageProxy = P.Proxy
+languageProxy :: Proxy.Proxy Language
+languageProxy = Proxy.Proxy
 
 type Request = ()
 
-requestProxy :: P.Proxy Request
-requestProxy = P.Proxy
+requestProxy :: Proxy.Proxy Request
+requestProxy = Proxy.Proxy
 
-renderRequests :: [S.Req Request] -> T.Text
-renderRequests requests = requests & map renderRequest & T.intercalate ";"
+renderRequests :: [Servant.Req Request] -> Text.Text
+renderRequests requests = requests & map renderRequest & Text.intercalate ";"
 
-functionName :: S.Req Request -> T.Text
-functionName request = request & S._reqFuncName & S.snakeCase
+functionName :: Servant.Req Request -> Text.Text
+functionName request = request & Servant._reqFuncName & Servant.snakeCase
 
-functionArguments :: S.Req Request -> T.Text
+functionArguments :: Servant.Req Request -> Text.Text
 functionArguments _ = "(excon)"
 
-functionBody :: S.Req Request -> T.Text
-functionBody request = T.concat
+functionBody :: Servant.Req Request -> Text.Text
+functionBody request = Text.concat
     [ "excon.request("
-    , ":method=>:", T.toLower (E.decodeUtf8 (S._reqMethod request)), ","
+    , ":method=>:", Text.toLower (Text.decodeUtf8 (Servant._reqMethod request)), ","
     , ":path=>'',"
     , ":headers=>{},"
     , ":body=>nil"
     , ")"
     ]
 
-renderRequest :: S.Req Request -> T.Text
-renderRequest request = T.concat
+renderRequest :: Servant.Req Request -> Text.Text
+renderRequest request = Text.concat
     [ "def "
     , functionName request
     , functionArguments request
@@ -47,8 +47,8 @@ renderRequest request = T.concat
     , "end"
     ]
 
-requestsForAPI :: (S.HasForeign Language Request api, S.GenerateList Request (S.Foreign Request api)) => P.Proxy api -> [S.Req Request]
-requestsForAPI api = api & S.listFromAPI languageProxy requestProxy
+requestsForAPI :: (Servant.HasForeign Language Request api, Servant.GenerateList Request (Servant.Foreign Request api)) => Proxy.Proxy api -> [Servant.Req Request]
+requestsForAPI api = api & Servant.listFromAPI languageProxy requestProxy
 
-rubyForAPI :: (S.HasForeign Language Request api, S.GenerateList Request (S.Foreign Request api)) => P.Proxy api -> T.Text
+rubyForAPI :: (Servant.HasForeign Language Request api, Servant.GenerateList Request (Servant.Foreign Request api)) => Proxy.Proxy api -> Text.Text
 rubyForAPI api = api & requestsForAPI & renderRequests

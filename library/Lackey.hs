@@ -34,12 +34,15 @@ requestMethod request = request & Servant._reqMethod & Text.decodeUtf8 & Text.to
 requestPath :: Servant.Req Request -> Text.Text
 requestPath _request = "''"
 
+requestHeaders :: Servant.Req Request -> Text.Text
+requestHeaders _request = "{}"
+
 functionBody :: Servant.Req Request -> Text.Text
 functionBody request = Text.concat
     [ "excon.request("
     , ":method=>", requestMethod request, ","
     , ":path=>", requestPath request, ","
-    , ":headers=>{},"
+    , ":headers=>", requestHeaders request, ","
     , ":body=>nil"
     , ")"
     ]

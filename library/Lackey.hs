@@ -31,11 +31,14 @@ functionArguments _ = "(excon)"
 requestMethod :: Servant.Req Request -> Text.Text
 requestMethod request = request & Servant._reqMethod & Text.decodeUtf8 & Text.toLower & Text.cons ':'
 
+requestPath :: Servant.Req Request -> Text.Text
+requestPath _request = "''"
+
 functionBody :: Servant.Req Request -> Text.Text
 functionBody request = Text.concat
     [ "excon.request("
     , ":method=>", requestMethod request, ","
-    , ":path=>'',"
+    , ":path=>", requestPath request, ","
     , ":headers=>{},"
     , ":body=>nil"
     , ")"

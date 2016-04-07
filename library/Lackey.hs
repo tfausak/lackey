@@ -37,13 +37,16 @@ requestPath _request = "''"
 requestHeaders :: Servant.Req Request -> Text.Text
 requestHeaders _request = "{}"
 
+requestBody :: Servant.Req Request -> Text.Text
+requestBody _request = "nil"
+
 functionBody :: Servant.Req Request -> Text.Text
 functionBody request = Text.concat
     [ "excon.request("
     , ":method=>", requestMethod request, ","
     , ":path=>", requestPath request, ","
     , ":headers=>", requestHeaders request, ","
-    , ":body=>nil"
+    , ":body=>", requestBody request
     , ")"
     ]
 

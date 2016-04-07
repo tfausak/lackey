@@ -3,6 +3,7 @@
 
 module Lackey (rubyForAPI) where
 
+import Data.Function ((&))
 import qualified Data.Proxy as P
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as E
@@ -19,10 +20,10 @@ requestProxy :: P.Proxy Request
 requestProxy = P.Proxy
 
 renderRequests :: [S.Req Request] -> T.Text
-renderRequests requests = T.intercalate ";" (map renderRequest requests)
+renderRequests requests = requests & map renderRequest & T.intercalate ";"
 
 functionName :: S.Req Request -> T.Text
-functionName request = S.snakeCase (S._reqFuncName request)
+functionName request = request & S._reqFuncName & S.snakeCase
 
 functionArguments :: S.Req Request -> T.Text
 functionArguments _ = "(excon)"
@@ -47,7 +48,7 @@ renderRequest request = T.concat
     ]
 
 requestsForAPI :: (S.HasForeign Language Request api, S.GenerateList Request (S.Foreign Request api)) => P.Proxy api -> [S.Req Request]
-requestsForAPI api = S.listFromAPI languageProxy requestProxy api
+requestsForAPI api = api & S.listFromAPI languageProxy requestProxy
 
 rubyForAPI :: (S.HasForeign Language Request api, S.GenerateList Request (S.Foreign Request api)) => P.Proxy api -> T.Text
-rubyForAPI api = renderRequests (requestsForAPI api)
+rubyForAPI api = api & requestsForAPI & renderRequests

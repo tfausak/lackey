@@ -18,4 +18,4 @@ spec = parallel $ do
     describe "rubyForAPI" $ do
         it "supports get requests" $ do
             let api = Proxy.Proxy :: Proxy.Proxy (Servant.Get '[Servant.JSON] ())
-            Lackey.rubyForAPI api `shouldBe` "def get(excon)excon.request(:method=>:get,:path=>'',:headers=>{},:body=>nil)end"
+            Lackey.rubyForAPI api `shouldBe` "def get(excon)excon.request(:method=>:get,:path=>\"/\",:headers=>{},:body=>nil)end"

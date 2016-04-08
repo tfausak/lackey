@@ -58,11 +58,36 @@ getHeaders request =
     map Servant.unPathSegment &
     map underscore
 
+getURLPieces :: Servant.Req Request -> [Either Text.Text Text.Text]
+getURLPieces request =
+    let url = request & Servant._reqUrl
+        path =
+            url & Servant._path & map Servant.unSegment &
+            Maybe.mapMaybe
+                (\segment ->
+                      case segment of
+                          Servant.Static _ -> Nothing
+                          Servant.Cap arg -> Just arg) &
+            map Servant._argName &
+            map Servant.unPathSegment
+        query =
+            url & Servant._queryStr & map Servant._queryArgName &
+            map Servant._argName &
+            map Servant.unPathSegment
+    in map Left path ++ map Right query
+
 functionArguments :: Servant.Req Request -> Text.Text
 functionArguments request =
     Text.concat
         [ "("
         , [ [Just "excon"]
+          , request & getURLPieces &
+            map
+                (\piece ->
+                      case piece of
+                          Left capture -> underscore capture
+                          Right param -> underscore param <> ": nil") &
+            map Just
           , request & getHeaders & map (<> ": nil") & map Just
           , [ if hasBody request
                   then Just bodyArgument
@@ -78,7 +103,35 @@ requestMethod request =
     Text.cons ':'
 
 requestPath :: Servant.Req Request -> Text.Text
-requestPath _request = "''"
+requestPath request =
+    let path =
+            request & Servant._reqUrl & Servant._path & map Servant.unSegment &
+            map
+                (\x ->
+                      case x of
+                          Servant.Static y -> Servant.unPathSegment y
+                          Servant.Cap y ->
+                              let z =
+                                      y & Servant._argName &
+                                      Servant.unPathSegment &
+                                      underscore
+                              in "#{" <> z <> "}") &
+            Text.intercalate "/"
+        query =
+            request & Servant._reqUrl & Servant._queryStr &
+            map Servant._queryArgName &
+            map Servant._argName &
+            map Servant.unPathSegment &
+            map
+                (\x ->
+                      x <> "=#{" <> underscore x <> "}") &
+            Text.intercalate "&"
+        url =
+            "/" <> path <>
+            (if Text.null query
+                 then ""
+                 else "?" <> query)
+    in "\"" <> url <> "\""
 
 requestHeaders :: Servant.Req Request -> Text.Text
 requestHeaders request =

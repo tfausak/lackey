@@ -55,8 +55,7 @@ getHeaders request =
                   Servant.HeaderArg x -> Just x
                   Servant.ReplaceHeaderArg _ _ -> Nothing) &
     map Servant._argName &
-    map Servant.unPathSegment &
-    map underscore
+    map Servant.unPathSegment
 
 getURLPieces :: Servant.Req Request -> [Either Text.Text Text.Text]
 getURLPieces request =
@@ -88,7 +87,7 @@ functionArguments request =
                           Left capture -> underscore capture
                           Right param -> underscore param <> ": nil") &
             map Just
-          , request & getHeaders & map (<> ": nil") & map Just
+          , request & getHeaders & map underscore & map (<> ": nil") & map Just
           , [ if hasBody request
                   then Just bodyArgument
                   else Nothing]] &
@@ -139,7 +138,7 @@ requestHeaders request =
     , request & getHeaders &
       map
           (\x ->
-                ":" <> x <> "=>" <> x)
+                "\"" <> x <> "\"=>" <> underscore x)
     , ["}"]] &
     concat &
     Text.concat

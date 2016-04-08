@@ -79,7 +79,7 @@ spec = parallel $ do
         it "supports request headers" $ do
             let api = Proxy.Proxy :: Proxy.Proxy (Servant.Header "cookie" () Servant.:> Servant.Get '[Servant.JSON] ())
             Lackey.rubyForAPI api `shouldBe`
-                ruby "get" ",cookie: nil" "get" "" ":cookie=>cookie" False
+                ruby "get" ",cookie: nil" "get" "" "\"cookie\"=>cookie" False
 
         it "supports response headers" $ do
             let api = Proxy.Proxy :: Proxy.Proxy (Servant.Get '[Servant.JSON] (Servant.Headers '[] ()))
@@ -124,7 +124,7 @@ spec = parallel $ do
         it "sanitizes headers" $ do
             let api = Proxy.Proxy :: Proxy.Proxy (Servant.Header "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
             Lackey.rubyForAPI api `shouldBe`
-                ruby "get" ",a_: nil" "get" "" ":a_=>a_" False
+                ruby "get" ",a_: nil" "get" "" "\"A!\"=>a_" False
 
 -- Since every generated function has the same structure, it can be abstracted
 -- away behind this function.

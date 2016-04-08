@@ -1,152 +1,141 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Main where
-
-import Data.Proxy
-import Lackey
-import Servant.API
-import Test.Tasty
+import Data.Monoid ((<>))
+import qualified Data.Proxy as Proxy
+import qualified Data.Text as Text
+import qualified Lackey
+import qualified Servant.API as Servant
+import qualified Test.Tasty as Tasty
 import Test.Tasty.Hspec
 
 main :: IO ()
-main = defaultMain =<< testSpec "Lackey" spec
-
--- Since every generated function has the same structure, it can be abstracted
--- away behind this function.
-ruby :: String -> String -> String -> String -> String -> String -> String
-ruby name params method path headers body = "\
-    \def " ++ name ++ "(excon" ++ params ++ ")\n\
-    \  excon.request(\n\
-    \    method: :" ++ method ++ ",\n\
-    \    path: \"/" ++ path ++ "\",\n\
-    \    headers: {" ++ headers ++ "},\n\
-    \    body: " ++ body ++ "\n\
-    \  )\n\
-    \end\
-\"
+main = do
+    test <- testSpec "Lackey" spec
+    Tasty.defaultMain test
 
 spec :: Spec
-spec = do
+spec = parallel $ do
     describe "rubyForAPI" $ do
         it "supports delete requests" $ do
-            let api = Proxy :: Proxy (Delete '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "delete_index" "" "delete" "" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Delete '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "delete" "" "delete" "" "" False
 
         it "supports get requests" $ do
-            let api = Proxy :: Proxy (Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index" "" "get" "" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" "" "get" "" "" False
 
         it "supports patch requests" $ do
-            let api = Proxy :: Proxy (Patch '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "patch_index" "" "patch" "" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Patch '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "patch" "" "patch" "" "" False
 
         it "supports post requests" $ do
-            let api = Proxy :: Proxy (Post '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "post_index" "" "post" "" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Post '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "post" "" "post" "" "" False
 
         it "supports put requests" $ do
-            let api = Proxy :: Proxy (Put '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "put_index" "" "put" "" "" "nil"
-
-        it "supports path components" $ do
-            let api = Proxy :: Proxy ("resource" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_resource" "" "get" "resource" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Put '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "put" "" "put" "" "" False
 
         it "supports alternatives" $ do
-            let api = Proxy :: Proxy (Get '[] () :<|> Delete '[] ())
-            rubyForAPI api `shouldBe` concat
-                [ ruby "get_index" "" "get" "" "" "nil"
-                , "\n\n"
-                , ruby "delete_index" "" "delete" "" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Get '[Servant.JSON] () Servant.:<|> Servant.Delete '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe` Text.concat
+                [ ruby "get" "" "get" "" "" False
+                , ";"
+                , ruby "delete" "" "delete" "" "" False
                 ]
 
         it "supports captures" $ do
-            let api = Proxy :: Proxy (Capture "id" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_id" ", id" "get" "#{id}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Capture "id" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get_by_id" ",id" "get" "#{id}" "" False
 
         it "supports query flags" $ do
-            let api = Proxy :: Proxy (QueryFlag "flag" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", flag: false" "get" "?#{\"&flag\" if flag}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.QueryFlag "flag" Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",flag: nil" "get" "?flag=#{flag}" "" False
 
         it "supports query params" $ do
-            let api = Proxy :: Proxy (QueryParam "param" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_param" ", param: nil" "get" "?&param=#{param}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.QueryParam "param" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",param: nil" "get" "?param=#{param}" "" False
 
         it "supports multiple query params" $ do
-            let api = Proxy :: Proxy (QueryParams "params" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_params" ", params: []" "get" "?#{params.map { |x| \"&params[]=#{x}\" }.join}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.QueryParams "params" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",params: nil" "get" "?params=#{params}" "" False
 
         it "supports request bodies" $ do
-            let api = Proxy :: Proxy (ReqBody '[] () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index" ", body" "get" "" "" "body"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",body" "get" "" "" True
 
         it "supports request headers" $ do
-            let api = Proxy :: Proxy (Header "cookie" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_cookie" ", cookie: nil" "get" "" " \"cookie\" => cookie " "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Header "cookie" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",cookie: nil" "get" "" "\"cookie\"=>cookie" False
 
         it "supports response headers" $ do
-            let api = Proxy :: Proxy (Get '[] (Headers '[] ()))
-            rubyForAPI api `shouldBe`
-                ruby "get_index" "" "get" "" "" "nil"
-
-        it "supports raw" $ do
-            let api = Proxy :: Proxy Raw
-            rubyForAPI api `shouldBe` ""
-
-        it "supports raw as part of a larger API" $ do
-            let api = Proxy :: Proxy (Get '[] () :<|> Raw)
-            rubyForAPI api `shouldBe`
-                ruby "get_index" "" "get" "" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Get '[Servant.JSON] (Servant.Headers '[] ()))
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" "" "get" "" "" False
 
         it "puts the body param after captures" $ do
-            let api = Proxy :: Proxy (Capture "segment" () :> ReqBody '[] () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_segment" ", segment, body" "get" "#{segment}" "" "body"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Capture "segment" () Servant.:> Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get_by_segment" ",segment,body" "get" "#{segment}" "" True
 
-        it "puts the body param before query params" $ do
-            let api = Proxy :: Proxy (QueryFlag "flag" :> ReqBody '[] () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_flag" ", body, flag: false" "get" "?#{\"&flag\" if flag}" "" "body"
+        it "puts the body param after query params" $ do
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.QueryFlag "flag" Servant.:> Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",flag: nil,body" "get" "?flag=#{flag}" "" True
 
         it "sanitizes path segments" $ do
-            let api = Proxy :: Proxy ("A!" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_a_" "" "get" "A!" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy ("A!" Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get_A!" "" "get" "A!" "" False
 
         it "sanitizes captures" $ do
-            let api = Proxy :: Proxy (Capture "A!" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_a_" ", a_" "get" "#{a_}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Capture "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get_by_A!" ",a_" "get" "#{a_}" "" False
 
         it "sanitizes query flags" $ do
-            let api = Proxy :: Proxy (QueryFlag "A!" :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_a_" ", a_: false" "get" "?#{\"&A!\" if a_}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.QueryFlag "A!" Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",a_: nil" "get" "?A!=#{a_}" "" False
 
         it "sanitizes query params" $ do
-            let api = Proxy :: Proxy (QueryParam "A!" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_a_" ", a_: nil" "get" "?&A!=#{a_}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.QueryParam "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",a_: nil" "get" "?A!=#{a_}" "" False
 
         it "sanitizes multiple query params" $ do
-            let api = Proxy :: Proxy (QueryParams "A!" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_a_" ", a_: []" "get" "?#{a_.map { |x| \"&A![]=#{x}\" }.join}" "" "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.QueryParams "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",a_: nil" "get" "?A!=#{a_}" "" False
 
         it "sanitizes headers" $ do
-            let api = Proxy :: Proxy (Header "A!" () :> Get '[] ())
-            rubyForAPI api `shouldBe`
-                ruby "get_index_a_" ", a_: nil" "get" "" " \"A!\" => a_ " "nil"
+            let api = Proxy.Proxy :: Proxy.Proxy (Servant.Header "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
+            Lackey.rubyForAPI api `shouldBe`
+                ruby "get" ",a_: nil" "get" "" "\"A!\"=>a_" False
+
+-- Since every generated function has the same structure, it can be abstracted
+-- away behind this function.
+ruby :: Text.Text -> Text.Text -> Text.Text -> Text.Text -> Text.Text -> Bool -> Text.Text
+ruby name params method path headers body = "\
+    \def " <> name <> "(excon" <> params <> ")\
+      \excon.request(\
+        \:method=>:" <> method <> ",\
+        \:path=>\"/" <> path <> "\",\
+        \:headers=>{" <> headers <> "},\
+        \:body=>" <> (if body then "body" else "nil") <> "\
+      \)\
+    \end\
+\"

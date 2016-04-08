@@ -3,8 +3,10 @@
 
 module Lackey (rubyForAPI) where
 
+import qualified Data.Char as Char
 import Data.Function ((&))
 import qualified Data.Maybe as Maybe
+import Data.Monoid ((<>))
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
@@ -35,14 +37,37 @@ hasBody request =
 bodyArgument :: Text.Text
 bodyArgument = "body"
 
+underscore :: Text.Text -> Text.Text
+underscore text =
+    text & Text.toLower &
+    Text.map
+        (\c ->
+              if Char.isAlphaNum c
+                  then c
+                  else '_')
+
+getHeaders :: Servant.Req Request -> [Text.Text]
+getHeaders request =
+    request & Servant._reqHeaders &
+    Maybe.mapMaybe
+        (\h ->
+              case h of
+                  Servant.HeaderArg x -> Just x
+                  Servant.ReplaceHeaderArg _ _ -> Nothing) &
+    map Servant._argName &
+    map Servant.unPathSegment &
+    map underscore
+
 functionArguments :: Servant.Req Request -> Text.Text
 functionArguments request =
     Text.concat
         [ "("
-        , [ Just "excon"
-          , if hasBody request
-                then Just bodyArgument
-                else Nothing] &
+        , [ [Just "excon"]
+          , request & getHeaders & map (<> ": nil") & map Just
+          , [ if hasBody request
+                  then Just bodyArgument
+                  else Nothing]] &
+          concat &
           Maybe.catMaybes &
           Text.intercalate ","
         , ")"]
@@ -56,7 +81,15 @@ requestPath :: Servant.Req Request -> Text.Text
 requestPath _request = "''"
 
 requestHeaders :: Servant.Req Request -> Text.Text
-requestHeaders _request = "{}"
+requestHeaders request =
+    [ ["{"]
+    , request & getHeaders &
+      map
+          (\x ->
+                ":" <> x <> "=>" <> x)
+    , ["}"]] &
+    concat &
+    Text.concat
 
 requestBody :: Servant.Req Request -> Text.Text
 requestBody request =

@@ -27,6 +27,7 @@ tests:
     - servant
     - tasty >=0.11 && <0.12
     - tasty-hspec >=1.1 && <1.2
+    - text
     ghc-options:
     - -rtsopts
     - -threaded

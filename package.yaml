@@ -10,7 +10,7 @@ ghc-options: -Wall
 github: tfausak/lackey
 library:
   dependencies:
-  - base >=4.8 && <4.9
+  - base >=4.8 && <4.10
   - servant >=0.5 && <0.7
   - servant-foreign >=0.5 && <0.7
   - text >=1.2 && <1.3

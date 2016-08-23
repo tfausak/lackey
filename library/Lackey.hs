@@ -17,7 +17,7 @@ type Language = Servant.NoTypes
 languageProxy :: Proxy.Proxy Language
 languageProxy = Proxy.Proxy
 
-type Request = ()
+type Request = Servant.NoContent
 
 requestProxy :: Proxy.Proxy Request
 requestProxy = Proxy.Proxy

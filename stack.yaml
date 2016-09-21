@@ -1,4 +1,1 @@
-extra-deps:
-- servant-0.8
-- servant-foreign-0.8
-resolver: nightly-2016-08-23
+resolver: nightly-2016-09-21

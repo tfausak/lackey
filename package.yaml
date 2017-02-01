@@ -11,8 +11,8 @@ github: tfausak/lackey
 library:
   dependencies:
   - base >=4.8 && <4.10
-  - servant >=0.8 && <0.10
-  - servant-foreign >=0.8 && <0.10
+  - servant >=0.8 && <0.11
+  - servant-foreign >=0.8 && <0.11
   - text >=1.2 && <1.3
   source-dirs: library
 license: MIT

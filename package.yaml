@@ -34,4 +34,4 @@ tests:
     - -with-rtsopts=-N
     source-dirs: test-suite
     main: Main.hs
-version: '0.4.4'
+version: '0.4.5'

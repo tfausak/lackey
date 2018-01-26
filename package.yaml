@@ -1,5 +1,5 @@
 name: lackey
-version: 0.4.7
+version: 1.0.0
 
 category: Web
 description: Lackey generates Ruby clients from Servant APIs.

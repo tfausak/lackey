@@ -16,8 +16,8 @@ synopsis: Generate Ruby clients from Servant APIs.
 
 dependencies:
   - base >= 4.8 && < 4.11
-  - servant >= 0.8 && < 0.13
-  - servant-foreign >= 0.8 && < 0.11
+  - servant >= 0.8 && < 0.14
+  - servant-foreign >= 0.8 && < 0.12
   - text >= 1.2 && < 1.3
 ghc-options:
   - -Wall

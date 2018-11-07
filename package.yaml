@@ -15,7 +15,7 @@ maintainer: Taylor Fausak
 synopsis: Generate Ruby clients from Servant APIs.
 
 dependencies:
-  base: '>= 4.9.0 && < 4.12'
+  base: '>= 4.9.0 && < 4.13'
   servant: '>= 0.8.1 && < 0.15'
   servant-foreign: '>= 0.8.1 && < 0.12'
   text: '>= 1.2.2 && < 1.3'

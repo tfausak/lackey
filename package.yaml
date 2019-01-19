@@ -31,7 +31,7 @@ library:
 tests:
   test:
     dependencies:
-      hspec: '>= 2.2.3 && < 2.7'
+      hspec: '>= 2.2.3 && < 2.8'
       lackey: -any
     ghc-options:
       - -rtsopts

@@ -8,7 +8,6 @@ module Lackey
 import qualified Data.Char as Char
 import Data.Function ((&))
 import qualified Data.Maybe as Maybe
-import Data.Monoid ((<>))
 import qualified Data.Proxy as Proxy
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text

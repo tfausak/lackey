@@ -32,7 +32,6 @@ library
     -Wno-safe
     -Wno-unsafe
   hs-source-dirs: src/lib
-  other-modules: Paths_lackey
 
   if impl(ghc >= 8.10)
     ghc-options:

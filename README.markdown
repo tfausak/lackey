@@ -1,7 +1,8 @@
 # [Lackey][]
 
-[![Version badge][]][version]
-[![Build badge][]][build]
+[![Travis CI](https://travis-ci.org/tfausak/lackey.svg?branch=master)](https://travis-ci.org/tfausak/lackey)
+[![Hackage](https://img.shields.io/hackage/v/lackey)](https://hackage.haskell.org/package/lackey)
+[![Stackage](https://www.stackage.org/package/lackey/badge/nightly?label=stackage)](https://www.stackage.org/package/lackey)
 
 Lackey is a Haskell library for generating Ruby consumers of [Servant][] APIs.
 
@@ -34,9 +35,5 @@ main = Text.putStrLn ruby
 The generated functions require [Excon][].
 
 [Lackey]: https://github.com/tfausak/lackey
-[Version badge]: https://www.stackage.org/package/lackey/badge/nightly?label=version
-[version]: https://www.stackage.org/package/lackey
-[Build badge]: https://travis-ci.org/tfausak/lackey.svg?branch=master
-[build]: https://travis-ci.org/tfausak/lackey
 [Servant]: https://haskell-servant.readthedocs.org/en/stable/
 [Excon]: https://rubygems.org/gems/excon

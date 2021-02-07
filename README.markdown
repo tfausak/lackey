@@ -1,6 +1,6 @@
 # [Lackey][]
 
-[![Travis CI](https://travis-ci.org/tfausak/lackey.svg?branch=master)](https://travis-ci.org/tfausak/lackey)
+[![CI](https://github.com/tfausak/lackey/workflows/CI/badge.svg)](https://github.com/tfausak/lackey/actions/new)
 [![Hackage](https://img.shields.io/hackage/v/lackey)](https://hackage.haskell.org/package/lackey)
 [![Stackage](https://www.stackage.org/package/lackey/badge/nightly?label=stackage)](https://www.stackage.org/package/lackey)
 

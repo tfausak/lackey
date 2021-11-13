@@ -1,7 +1,7 @@
 cabal-version: >= 1.10
 
 name: lackey
-version: 1.0.15
+version: 1.0.16
 
 synopsis: Generate Ruby clients from Servant APIs.
 description: Lackey generates Ruby clients from Servant APIs.

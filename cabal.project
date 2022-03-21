@@ -1,15 +1,10 @@
 packages: .
 
--- https://github.com/haskell-servant/servant/pull/1482
+-- https://github.com/haskell-servant/servant/pull/1555
 source-repository-package
-  location: https://github.com/brandon-leapyear/servant
-  subdir: servant
-  tag: a04f98e3a1dbe532713e69cbd4624f9fdd4e9dd5
-  type: git
-
--- https://github.com/haskell-servant/servant/pull/1482
-source-repository-package
-  location: https://github.com/brandon-leapyear/servant
-  subdir: servant-foreign
-  tag: a04f98e3a1dbe532713e69cbd4624f9fdd4e9dd5
+  location: https://github.com/ysangkok/servant
+  subdir:
+    servant
+    servant-foreign
+  tag: 408352320e82d87ea133855a8ecc5f806afe4850
   type: git

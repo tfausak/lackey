@@ -68,7 +68,7 @@ test-suite test
   import: executable
 
   build-depends:
-    , hspec >= 2.7.6 && < 2.10
+    , hspec >= 2.7.6 && < 2.11
     , servant >= 0.16.2 && < 0.20
   hs-source-dirs: source/test-suite
   main-is: Main.hs

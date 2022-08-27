@@ -1,0 +1,14 @@
+packages: .
+
+-- https://github.com/zmthy/http-media/pull/40
+source-repository-package
+  location: https://github.com/ysangkok/http-media
+  tag: eb61a0fe66b98028ea215b0e5c9a338376c7c1d4
+  type: git
+
+-- https://github.com/haskell-servant/servant/pull/1592
+source-repository-package
+  location: https://github.com/TeofilC/servant
+  subdir: servant servant-foreign
+  tag: e9a799ecb5cef047909b4c22071a8fa68ba30a8a
+  type: git

@@ -61,7 +61,7 @@ library
   exposed-modules: Lackey
   hs-source-dirs: source/library
 
-test-suite test
+test-suite lackey-test-suite
   import: executable
 
   build-depends:

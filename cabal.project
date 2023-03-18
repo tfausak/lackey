@@ -1,5 +1,16 @@
 packages: .
 
 allow-newer:
-  -- https://github.com/haskell-servant/servant/pull/1607
-  , servant-foreign:lens
+  , semigroupoids:base
+  , singleton-bool:base
+  , sop-core:base
+
+  -- https://github.com/fizruk/http-api-data/issues/125
+  , http-api-data:base
+
+  -- https://github.com/zmthy/http-media/issues/43
+  , http-media:base
+
+  -- https://github.com/haskell-servant/servant/pull/1627
+  , servant-foreign:base
+  , servant:base

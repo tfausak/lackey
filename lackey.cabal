@@ -62,7 +62,7 @@ test-suite lackey-test-suite
   import: executable
 
   build-depends:
-    , hspec >= 2.7.6 && < 2.11
+    , hspec >= 2.9.7 && < 2.12
     , servant >= 0.19.1 && < 0.20
   hs-source-dirs: source/test-suite
   main-is: Main.hs

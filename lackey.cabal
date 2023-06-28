@@ -63,7 +63,7 @@ test-suite lackey-test-suite
 
   build-depends:
     , hspec >= 2.9.7 && < 2.12
-    , servant >= 0.19.1 && < 0.20
+    , servant >= 0.19.1 && < 0.21
   hs-source-dirs: source/test-suite
   main-is: Main.hs
   type: exitcode-stdio-1.0

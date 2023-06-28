@@ -1,4 +1,5 @@
 packages: .
+constraints: aeson < 2.2
 
 allow-newer:
   , semigroupoids:base

@@ -1,4 +1,5 @@
 packages: .
+constraints: aeson < 2.2
 
 allow-newer:
   , semigroupoids:base
@@ -10,7 +11,3 @@ allow-newer:
 
   -- https://github.com/zmthy/http-media/issues/43
   , http-media:base
-
-  -- https://github.com/haskell-servant/servant/pull/1627
-  , servant-foreign:base
-  , servant:base

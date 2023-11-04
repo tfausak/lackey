@@ -1,8 +1,13 @@
 packages: .
-constraints: aeson < 2.2
 
 allow-newer:
   , semigroupoids:base
+  , servant-foreign:base
+  , servant-foreign:text
+  , servant:base
+  , servant:bytestring
+  , servant:deepseq
+  , servant:text
   , singleton-bool:base
   , sop-core:base
 

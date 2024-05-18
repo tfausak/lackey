@@ -1,1 +1,11 @@
 packages: .
+allow-newer:
+  -- https://github.com/fizruk/http-api-data/issues/139
+  , http-api-data:base
+  -- https://github.com/haskell-servant/servant/pull/1753
+  , servant-foreign:base
+  , servant:base
+  -- https://github.com/phadej/singleton-bool/issues/27
+  , singleton-bool:base
+  -- https://github.com/HeinrichApfelmus/vault/pull/41
+  , vault:base

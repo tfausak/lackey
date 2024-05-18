@@ -1,7 +1,8 @@
 # [Lackey][]
 
-[![Workflow](https://github.com/tfausak/lackey/actions/workflows/ci.yml/badge.svg)](https://github.com/tfausak/lackey/actions/workflows/ci.yml)
-[![Hackage](https://badgen.net/hackage/v/lackey)](https://hackage.haskell.org/package/lackey)
+[![Workflow](https://github.com/tfausak/lackey/actions/workflows/workflow.yaml/badge.svg)](https://github.com/tfausak/lackey/actions/workflows/workflow.yaml)
+[![Hackage](https://img.shields.io/hackage/v/lackey)](https://hackage.haskell.org/package/lackey)
+[![Stackage](https://www.stackage.org/package/lackey/badge/nightly?label=stackage)](https://www.stackage.org/package/lackey)
 
 Lackey is a Haskell library for generating Ruby consumers of [Servant][] APIs.
 

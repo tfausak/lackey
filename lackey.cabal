@@ -21,7 +21,6 @@ source-repository head
 
 flag pedantic
   default: False
-  description: Enables @-Werror@, which turns warnings into errors.
   manual: True
 
 common library
@@ -53,6 +52,7 @@ library
     servant-foreign ^>=0.16,
     text ^>=2.0.2 || ^>=2.1,
 
+  -- cabal-gild: discover source/library
   exposed-modules: Lackey
   hs-source-dirs: source/library
 

@@ -78,19 +78,19 @@ functionArguments :: Servant.Req Request -> Text.Text
 functionArguments request =
   Text.concat
     [ "(",
-      [ [Just "excon"],
-        request
-          & getURLPieces
-          & fmap
-            ( \piece -> Just $ case piece of
-                Left capture -> underscore capture
-                Right param -> underscore param <> ": nil"
-            ),
-        request & getHeaders & fmap (Just . (<> ": nil") . underscore),
-        [if hasBody request then Just bodyArgument else Nothing]
-      ]
-        & concat
-        & Maybe.catMaybes
+      concatMap
+        Maybe.catMaybes
+        [ [Just "excon"],
+          request
+            & getURLPieces
+            & fmap
+              ( \piece -> Just $ case piece of
+                  Left capture -> underscore capture
+                  Right param -> underscore param <> ": nil"
+              ),
+          request & getHeaders & fmap (Just . (<> ": nil") . underscore),
+          [if hasBody request then Just bodyArgument else Nothing]
+        ]
         & Text.intercalate ",",
       ")"
     ]

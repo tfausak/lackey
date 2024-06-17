@@ -45,8 +45,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.Get '[Servant.JSON] () Servant.:<|> Servant.Delete '[Servant.JSON] ()
-                  )
+                  (Servant.Get '[Servant.JSON] () Servant.:<|> Servant.Delete '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` Text.concat
             [ ruby "get" "" "get" "" "" False,
@@ -58,8 +57,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.Capture "id" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.Capture "id" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby "get_by_id" ",id" "get" "#{id}" "" False
 
@@ -67,8 +65,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.QueryFlag "flag" Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.QueryFlag "flag" Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby
             "get"
@@ -82,8 +79,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.QueryParam "param" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.QueryParam "param" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby
             "get"
@@ -97,8 +93,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.QueryParams "params" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.QueryParams "params" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby
             "get"
@@ -112,8 +107,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby "get" ",body" "get" "" "" True
 
@@ -121,8 +115,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.Header "cookie" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.Header "cookie" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby
             "get"
@@ -144,8 +137,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.Capture "segment" () Servant.:> Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.Capture "segment" () Servant.:> Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby
             "get_by_segment"
@@ -159,8 +151,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.QueryFlag "flag" Servant.:> Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.QueryFlag "flag" Servant.:> Servant.ReqBody '[Servant.JSON] () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby
             "get"
@@ -182,8 +173,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.Capture "A!" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.Capture "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby "get_by_A!" ",a_" "get" "#{a_}" "" False
 
@@ -191,8 +181,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.QueryFlag "A!" Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.QueryFlag "A!" Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby "get" ",a_: nil" "get" "?A!=#{a_}" "" False
 
@@ -200,8 +189,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.QueryParam "A!" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.QueryParam "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby "get" ",a_: nil" "get" "?A!=#{a_}" "" False
 
@@ -209,8 +197,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.QueryParams "A!" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.QueryParams "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby "get" ",a_: nil" "get" "?A!=#{a_}" "" False
 
@@ -218,8 +205,7 @@ main =
         let api =
               Proxy.Proxy ::
                 Proxy.Proxy
-                  ( Servant.Header "A!" () Servant.:> Servant.Get '[Servant.JSON] ()
-                  )
+                  (Servant.Header "A!" () Servant.:> Servant.Get '[Servant.JSON] ())
         Lackey.rubyForAPI api
           `Hspec.shouldBe` ruby "get" ",a_: nil" "get" "" "\"A!\"=>a_" False
 

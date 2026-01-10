@@ -1,7 +1,25 @@
 packages: .
 allow-newer:
-  -- https://github.com/fizruk/http-api-data/issues/147
+  , aeson:base
+  , aeson:containers
+  , aeson:template-haskell
+  , boring:base
+  , free:containers
+  , free:template-haskell
   , http-api-data:base
-  -- https://github.com/haskell-servant/servant/pull/1753
+  , http-api-data:containers
+  , http-media:bytestring
+  , http-media:containers
+  , indexed-traversable-instances:base
+  , indexed-traversable:base
+  , indexed-traversable:containers
+  , lens:containers
+  , lens:template-haskell
+  , semialign:base
+  , semialign:containers
   , servant-foreign:base
   , servant:base
+  , singleton-bool:base
+  , these:base
+  , time-compat:base
+  , uuid-types:template-haskell

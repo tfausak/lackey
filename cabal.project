@@ -4,6 +4,7 @@ allow-newer:
   , aeson:containers
   , aeson:template-haskell
   , boring:base
+  , dec:base
   , free:containers
   , free:template-haskell
   , http-api-data:base
@@ -20,6 +21,7 @@ allow-newer:
   , servant-foreign:base
   , servant:base
   , singleton-bool:base
+  , some:base
   , these:base
   , time-compat:base
   , uuid-types:template-haskell

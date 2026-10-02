@@ -33,7 +33,7 @@ jobs:
         with:
           name: lackey-${{ github.sha }}-${{ matrix.os }}-${{ matrix.ghc }}
           path: artifact.tar
-      - run: cabal run -- lackey-test-suite --randomize --strict
+      - run: cabal run lackey-test-suite -- --randomize --strict
     strategy:
       matrix:
         include:
